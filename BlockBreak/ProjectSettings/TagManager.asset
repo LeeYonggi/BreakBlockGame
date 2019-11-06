@@ -8,6 +8,8 @@ TagManager:
   - Floor
   - Wall
   - Ball
+  - PredictBall
+  - Item
   layers:
   - Default
   - TransparentFX

@@ -10,20 +10,32 @@ public class Ball : MonoBehaviour
         BALL_MOVE,
         BALL_FOLLOW
     }
-    private Vector2 m_MoveVector = new Vector2(0, 0);
-    private float m_MoveSpeed = 0.0f;
-    private BALL_STATE ballState = BALL_STATE.BALL_STOP;
-    private Rigidbody2D rb2D = null;
-    private CircleCollider2D circleCollider2D = null;
-    private float collisionRadius = 0.0f;
+    private Vector2 m_MoveVector = new Vector2(0, 0);       // 방향벡터
 
+    private float m_MoveSpeed = 0.0f;                       // 이동속도
+    
+    private BALL_STATE ballState = BALL_STATE.BALL_STOP;    // 현재 공 상태
+    
+    private float collisionRadius = 0.0f;                   // 공 반지름
+
+
+    #region Component
+    private Rigidbody2D rb2D = null;
+    
+    private CircleCollider2D circleCollider2D = null;
+    #endregion
+
+    #region Property
     public BALL_STATE BallState { get => ballState; set => ballState = value; }
+    #endregion
 
     // Start is called before the first frame update
     void Start()
     {
         rb2D = GetComponent<Rigidbody2D>();
+
         circleCollider2D = GetComponent<CircleCollider2D>();
+
         collisionRadius = circleCollider2D.radius;
     }
 
@@ -40,10 +52,14 @@ public class Ball : MonoBehaviour
 
                 break;
             case BALL_STATE.BALL_MOVE:
+
                 BallMoveUpdate();
-                // 가로로 무한히 반복 방지
+
+                #region 무한 반복 방지 |현재 사용하지 않음|
                 //if (rb2D.velocity.y <= 0.07f && rb2D.velocity.y >= -0.07f)
                 //    rb2D.AddForce(new Vector2(0, -1));
+                #endregion
+
                 break;
             case BALL_STATE.BALL_FOLLOW:
                 FollowFirstBall();
@@ -53,6 +69,10 @@ public class Ball : MonoBehaviour
                 break;
         }
     }
+
+    /// <summary>
+    /// 공 이동 업데이트
+    /// </summary>
     private void BallMoveUpdate()
     {
         Vector2 rayDirection = m_MoveVector;
@@ -78,7 +98,13 @@ public class Ball : MonoBehaviour
 
         transform.Translate(m_MoveVector * m_MoveSpeed * Time.fixedDeltaTime);
     }
-
+    /// <summary>
+    /// 공 이동 함수. 한번만 불러주면 알아서 이동함.
+    /// </summary>
+    /// <param name="moveVector"></param>
+    /// 방향벡터
+    /// <param name="moveSpeed"></param>
+    /// 이동속도
     public void BallMove(Vector2 moveVector, float moveSpeed)
     {
         m_MoveSpeed = moveSpeed;
@@ -103,22 +129,27 @@ public class Ball : MonoBehaviour
         //    ChangeBallDirection(collision.contacts[0].normal);
         //}
         #endregion
-
-
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // 바닥에 닿았을 시
         if (collision.gameObject.tag.Equals("Floor"))
             CollisionFloor(collision.gameObject);
+
+        if (collision.gameObject.tag.Equals("Item"))
+            GameManager.Instance.;
     }
 
     private void CollisionFloor(GameObject collision)
     {
         BallState = BALL_STATE.BALL_FOLLOW;
+
         m_MoveVector = new Vector2(0, 0);
+
         if (BallManager.Instance.FirstBall == null)
         {
             BallManager.Instance.FirstBall = gameObject;
+
             BallState = BALL_STATE.BALL_STOP;
         }
     }
@@ -131,6 +162,7 @@ public class Ball : MonoBehaviour
         if(BallManager.Instance.FirstBall)
         {
             GameObject firstBall = BallManager.Instance.FirstBall;
+
             transform.position = Vector2.Lerp(transform.position, firstBall.transform.position, Time.deltaTime * 8);
 
             if(Vector2.Distance(transform.position, firstBall.transform.position) < 0.2f)

@@ -12,31 +12,66 @@ public class BallManager : MonoBehaviour
         KEY_UP
     }
 
+    enum FIRE_STATE
+    {
+        IDLE,
+        FIRE_ACTIVATION
+    }
+
     private static BallManager instance = null;
 
-    private Vector2 firstPosition = new Vector2(0, 0);  // 클릭 시 마우스 좌표
-    private Vector2 secondPosition = new Vector2(0, 0); // 손을 땠을 시 마우스 좌표
+    /// <summary>
+    /// 클릭 시 마우스 좌표
+    /// </summary>
+    private Vector2 firstPosition = new Vector2(0, 0);  
 
-    private float shootDelay = 0.01f;                   // 공 발사 딜레이
-    private float shootSpeed = 10.0f;                   // 공 스피드
+    /// <summary>
+    /// 손 땠을 시 마우스 좌표
+    /// </summary>
+    private Vector2 secondPosition = new Vector2(0, 0); 
+
+    private float shootDelay = 0.05f;                   // 공 발사 딜레이
+    private float shootDelayCount = 0.0f;               // 현재 공 발사 딜레이
+    private float shootSpeed = 6.0f;                    // 공 스피드
+    private Vector2 ballMoveVector = new Vector2(0, 0); // 공 방향벡터
+
+    [SerializeField]
+    private float limitDegree = 20.0f;                  // 발사 각도 제한
+
+    /// <summary>
+    /// 현재 리스트에서 발사되는 공 인덱스
+    /// </summary>
+    private int nowShootindex = 0;                      
 
     private KEY_STATE m_KeyState = KEY_STATE.NONE;      // 모바일 마우스 상태
     private KEY_STATE m_PcKeyState = KEY_STATE.NONE;    // pc 마우스 상태
+    private FIRE_STATE m_FireState = FIRE_STATE.IDLE;   // 볼 발사 상태
 
     private List<Ball> ballPacks = new List<Ball>();    // 볼 관리 리스트
 
-    private readonly Vector2 firstBallPosition = new Vector2(0, -2.8f); // 첫번째 공 좌표
+    /// <summary>
+    /// 첫번째 공 좌표
+    /// </summary>
+    private readonly Vector2 firstBallPosition = new Vector2(0, -2.8f);
 
-    private GameObject isFirstBall = null;              // 첫번째 공
+    public GameObject firstBall = null;                 // 첫번째 공
+
+    [SerializeField]
+    private GameObject predictBall = null;              // 예측하는 공
 
     [SerializeField]
     private GameObject ballPrefab = null;               // 공 프리펩
 
     [SerializeField]
-    private GameObject arrow = null;              // 화살표 오브젝트
+    private GameObject arrow = null;                    // 화살표 오브젝트
 
+
+    #region Property
     public static BallManager Instance { get => instance; set => instance = value; }
-    public GameObject FirstBall { get => isFirstBall; set => isFirstBall = value; }
+    public GameObject FirstBall { get => firstBall; set => firstBall = value; }
+    public Vector2 FirstPosition { get => firstPosition; set => firstPosition = value; }
+    public Vector2 SecondPosition { get => secondPosition; set => secondPosition = value; }
+    #endregion
 
     public delegate void ActiveControll();
     
@@ -63,8 +98,6 @@ public class BallManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        StepInitialize();
-
         if (Instance == null)
             Instance = this;
         else if (Instance == this)
@@ -74,13 +107,30 @@ public class BallManager : MonoBehaviour
         for(int i = 0; i < 1; i++)
             CreateBall();
 
-        OnMouseUp += MoveBall;
+        FirstBall = ballPacks[0].gameObject;
+
+        OnMouseUp += FireBallInitalize;
         OnMouseUp += DisableArrow;
+        OnMouseUp += StepInitialize;
     }
 
     // Update is called once per frame
     void Update()
     {
+    }
+
+    private void FixedUpdate()
+    {
+        switch (m_FireState)
+        {
+            case FIRE_STATE.IDLE:
+                break;
+            case FIRE_STATE.FIRE_ACTIVATION:
+                MoveBallLoop();
+                break;
+            default:
+                break;
+        }
     }
 
     // 마우스 컨트롤
@@ -100,6 +150,8 @@ public class BallManager : MonoBehaviour
     {
         if (IsMousePressPossible() == false) return;
 
+        predictBall.SetActive(true);
+
         arrow.SetActive(true);
 
         Vector3 euler = new Vector3(0, 0, Mathf.Atan2(v2.y - v1.y, v2.x - v1.x) * Mathf.Rad2Deg - 90);
@@ -111,6 +163,7 @@ public class BallManager : MonoBehaviour
     void DisableArrow()
     {
         arrow.SetActive(false);
+        predictBall.SetActive(false);
     }
 
     bool IsMousePressPossible()
@@ -172,6 +225,21 @@ public class BallManager : MonoBehaviour
     {
         secondPosition = GetTouchPoint();
 
+        Vector2 directionVector = secondPosition - firstPosition;
+        directionVector.Normalize();
+        float seta = Vector2.Dot(directionVector, new Vector2(1, 0));
+        if (seta > Mathf.Cos(limitDegree * Mathf.Deg2Rad) || (directionVector.y < 0 && directionVector.x > 0))
+        {
+            secondPosition.x = firstPosition.x + Mathf.Cos(limitDegree * Mathf.Deg2Rad);
+            secondPosition.y = firstPosition.y + Mathf.Sin(limitDegree * Mathf.Deg2Rad);
+        }
+
+        if(seta < Mathf.Cos((180 - limitDegree) * Mathf.Deg2Rad) || (directionVector.y < 0 && directionVector.x < 0))
+        {
+            secondPosition.x = firstPosition.x + Mathf.Cos((180 - limitDegree) * Mathf.Deg2Rad);
+            secondPosition.y = firstPosition.y + Mathf.Sin((180 - limitDegree) * Mathf.Deg2Rad);
+        }
+
         ActiveArrowRotate(firstPosition, secondPosition);
     }
 
@@ -194,28 +262,44 @@ public class BallManager : MonoBehaviour
     }
 
     // 방향 백터를 구한 뒤, 공 발사 코르틴 루프를 돌려주는 함수.
-    void MoveBall()
+    void FireBallInitalize()
     {
-        Vector2 moveVector = secondPosition - firstPosition;
+        ballMoveVector = secondPosition - firstPosition;
 
-        moveVector.Normalize();
+        ballMoveVector.Normalize();
 
-        StartCoroutine(MoveBallLoop(moveVector, shootSpeed));
+        nowShootindex = 0;
+
+        m_FireState = FIRE_STATE.FIRE_ACTIVATION;
     }
 
     // 공을 발사시켜 주는 루프
-    IEnumerator MoveBallLoop(Vector2 moveVector, float speed)
+    void MoveBallLoop()
     {
-        for(int i = 0; i < ballPacks.Count; i++)
+        if(shootDelayCount <= 0.0f)
         {
-            ballPacks[i].BallMove(moveVector, speed);
+            ballPacks[nowShootindex].BallMove(ballMoveVector, shootSpeed);
 
-            yield return new WaitForSeconds(shootDelay);
+            nowShootindex += 1;
+
+            if(nowShootindex >= ballPacks.Count)
+            {
+                shootDelayCount = 0.0f;
+
+                m_FireState = FIRE_STATE.IDLE;
+            }
+            else
+                shootDelayCount = shootDelay;
         }
+
+        shootDelayCount -= Time.fixedDeltaTime;
     }
+
     // 모두 공이 멈추었는지 반환해주는 함수.
     public bool IsBallAllStop()
     {
+        if (m_FireState.Equals(FIRE_STATE.FIRE_ACTIVATION)) return false;
+
         for(int i = 0; i < ballPacks.Count; i++)
         {
             if (ballPacks[i].BallState != Ball.BALL_STATE.BALL_STOP)

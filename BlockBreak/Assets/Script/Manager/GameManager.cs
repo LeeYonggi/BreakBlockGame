@@ -13,12 +13,16 @@ public class GameManager : MonoBehaviour
     private GameObject boxPrefab = null;        // 박스 프리펩
     [SerializeField]
     private GameObject triangleBoxPrefab = null;// 삼각형 박스 프리펩
+    [SerializeField]
+    private GameObject levelUpItem = null;      // 레벨업 아이템
 
-    int nowCount = 1;
+    int nowCount = 1;                           // 박스 hp
 
     private static readonly int MAX_LINEBOX = 9;
 
     private List<GameObject> boxPacks = new List<GameObject>();
+
+    private List<GameObject> itemPacks = new List<GameObject>();
 
     private GameObject[] nowBoxLine = new GameObject[MAX_LINEBOX];
 
@@ -39,7 +43,11 @@ public class GameManager : MonoBehaviour
             GameObject.Destroy(gameObject);
 
         CreateBox();
+        CreateItem();
+
         nowCount += 1;
+
+        BallManager.Instance.OnMouseUp += ChangePlay;
     }
 
     // Update is called once per frame
@@ -48,9 +56,7 @@ public class GameManager : MonoBehaviour
         switch (GameStep)
         {
             case GAME_STEP.IDLE:
-                BallManager.Instance.StepInitialize();
                 BallManager.Instance.MouseControll();
-                BallManager.Instance.OnMouseUp += ChangePlay;
 
                 break;
             case GAME_STEP.PLAY:
@@ -67,6 +73,9 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < boxPacks.Count; i++)
             boxPacks[i].transform.Translate(new Vector2(0, -0.6f));
+
+        for(int i = 0; i < itemPacks.Count; i++)
+            itemPacks[i].transform.Translate(new Vector2(0, -0.6f));
 
         for (int i = 0; i < nowBoxLine.Length; i++)
             nowBoxLine[i] = null;
@@ -96,7 +105,13 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        GameObject box = GameObject.Instantiate(boxPrefab, transform);
+        int boxRandom = Random.Range(1, 10);
+        GameObject box = null;
+
+        if (boxRandom < 10)
+            box = GameObject.Instantiate(boxPrefab, transform);
+        else
+            box = GameObject.Instantiate(triangleBoxPrefab, transform);
 
         box.transform.position = new Vector2(random * 0.6f - 2.45f, 3.15f);
 
@@ -105,6 +120,25 @@ public class GameManager : MonoBehaviour
         box.GetComponent<Box>().BoxStatus = new BoxStatus(nowCount);
 
         nowBoxLine[random] = box;
+    }
+
+    void CreateItem()
+    {
+        int random = Random.Range(1, MAX_LINEBOX);
+
+        if (nowBoxLine[random] != null)
+        {
+            CreateItem();
+            return;
+        }
+
+        GameObject item = GameObject.Instantiate(levelUpItem);
+
+        item.transform.position = new Vector2(random * 0.6f - 2.45f, 3.15f);
+
+        boxPacks.Add(item);
+
+        nowBoxLine[random] = item;
     }
 
     public void DestroyBox(GameObject box)
