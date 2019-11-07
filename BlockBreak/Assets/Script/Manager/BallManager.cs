@@ -30,7 +30,7 @@ public class BallManager : MonoBehaviour
     /// </summary>
     private Vector2 secondPosition = new Vector2(0, 0); 
 
-    private float shootDelay = 0.05f;                   // 공 발사 딜레이
+    private float shootDelay = 0.01f;                   // 공 발사 딜레이
     private float shootDelayCount = 0.0f;               // 현재 공 발사 딜레이
     private float shootSpeed = 6.0f;                    // 공 스피드
     private Vector2 ballMoveVector = new Vector2(0, 0); // 공 방향벡터
@@ -83,7 +83,10 @@ public class BallManager : MonoBehaviour
     {
         GameObject ball = GameObject.Instantiate(ballPrefab, transform);
 
-        ball.transform.position = firstBallPosition;
+        if (firstBall)
+            ball.transform.position = firstBall.transform.position;
+        else
+            ball.transform.position = firstBallPosition;
 
         ballPacks.Add(ball.GetComponent<Ball>());
 
@@ -104,7 +107,7 @@ public class BallManager : MonoBehaviour
             GameObject.Destroy(gameObject);
 
         // 처음 공 생성
-        for(int i = 0; i < 1; i++)
+        for(int i = 0; i < 100; i++)
             CreateBall();
 
         FirstBall = ballPacks[0].gameObject;
@@ -261,7 +264,7 @@ public class BallManager : MonoBehaviour
         }
     }
 
-    // 방향 백터를 구한 뒤, 공 발사 코르틴 루프를 돌려주는 함수.
+    // 방향 백터를 구한 뒤, 공 발사 상태로 전환시켜주는 함수.
     void FireBallInitalize()
     {
         ballMoveVector = secondPosition - firstPosition;
@@ -306,5 +309,12 @@ public class BallManager : MonoBehaviour
                 return false;
         }
         return true;
+    }
+
+    public void AddBall()
+    {
+        if (m_FireState.Equals(FIRE_STATE.FIRE_ACTIVATION)) return;
+
+        CreateBall();
     }
 }

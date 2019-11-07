@@ -59,8 +59,8 @@ public class PredictBall : MonoBehaviour
     {
         Vector3 movePosition = new Vector3( 0, 0, 0 );
 
-        movePosition.x = direction.x * circleCollider2D.radius * 2;
-        movePosition.y = direction.y * circleCollider2D.radius * 2;
+        movePosition.x = direction.x * circleCollider2D.radius;
+        movePosition.y = direction.y * circleCollider2D.radius;
 
         transform.position = transform.position + movePosition;
         rb2D.position = transform.position;

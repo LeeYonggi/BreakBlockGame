@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GameObject levelUpItem = null;      // 레벨업 아이템
 
-    int nowCount = 1;                           // 박스 hp
+    int nowCount = 9000;                           // 박스 hp
 
     private static readonly int MAX_LINEBOX = 9;
 
@@ -25,6 +25,8 @@ public class GameManager : MonoBehaviour
     private List<GameObject> itemPacks = new List<GameObject>();
 
     private GameObject[] nowBoxLine = new GameObject[MAX_LINEBOX];
+
+    private int nextAddBall = 0;
 
     public enum GAME_STEP
     {
@@ -74,16 +76,23 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < boxPacks.Count; i++)
             boxPacks[i].transform.Translate(new Vector2(0, -0.6f));
 
-        for(int i = 0; i < itemPacks.Count; i++)
+        for (int i = 0; i < itemPacks.Count; i++)
             itemPacks[i].transform.Translate(new Vector2(0, -0.6f));
 
         for (int i = 0; i < nowBoxLine.Length; i++)
             nowBoxLine[i] = null;
 
+        for (int i = 0; i < nextAddBall; i++)
+            BallManager.Instance.AddBall();
+
+        nextAddBall = 0;
+
         int random = Random.Range(1, 7);
 
         for (int i = 0; i < random; i++)
             CreateBox();
+
+        CreateItem();
 
         GameStep = GAME_STEP.IDLE;
 
@@ -136,7 +145,7 @@ public class GameManager : MonoBehaviour
 
         item.transform.position = new Vector2(random * 0.6f - 2.45f, 3.15f);
 
-        boxPacks.Add(item);
+        itemPacks.Add(item);
 
         nowBoxLine[random] = item;
     }
@@ -145,5 +154,15 @@ public class GameManager : MonoBehaviour
     {
         boxPacks.Remove(box);
         Destroy(box);
+    }
+
+    public void DestroyItem(GameObject item)
+    {
+        itemPacks.Remove(item);
+    }
+
+    public void AddBallCount()
+    {
+        nextAddBall += 1;
     }
 }

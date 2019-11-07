@@ -15,14 +15,14 @@ public class Ball : MonoBehaviour
     private float m_MoveSpeed = 0.0f;                       // 이동속도
     
     private BALL_STATE ballState = BALL_STATE.BALL_STOP;    // 현재 공 상태
-    
-    private float collisionRadius = 0.0f;                   // 공 반지름
 
 
     #region Component
     private Rigidbody2D rb2D = null;
     
     private CircleCollider2D circleCollider2D = null;
+
+    private PhysicsBounceObject bounceComponent = null;
     #endregion
 
     #region Property
@@ -36,7 +36,9 @@ public class Ball : MonoBehaviour
 
         circleCollider2D = GetComponent<CircleCollider2D>();
 
-        collisionRadius = circleCollider2D.radius;
+        bounceComponent = GetComponent<PhysicsBounceObject>();
+
+        bounceComponent.OnBounce += BounceCollision;
     }
 
     // Update is called once per frame
@@ -49,11 +51,11 @@ public class Ball : MonoBehaviour
         switch (BallState)
         {
             case BALL_STATE.BALL_STOP:
+                bounceComponent.enabled = false;
 
                 break;
             case BALL_STATE.BALL_MOVE:
-
-                BallMoveUpdate();
+                bounceComponent.enabled = true;
 
                 #region 무한 반복 방지 |현재 사용하지 않음|
                 //if (rb2D.velocity.y <= 0.07f && rb2D.velocity.y >= -0.07f)
@@ -62,6 +64,8 @@ public class Ball : MonoBehaviour
 
                 break;
             case BALL_STATE.BALL_FOLLOW:
+                bounceComponent.enabled = false;
+
                 FollowFirstBall();
 
                 break;
@@ -70,34 +74,23 @@ public class Ball : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 공 이동 업데이트
-    /// </summary>
-    private void BallMoveUpdate()
+
+    public void BounceCollision(GameObject bounceObject, out bool isLoopBreak)
     {
-        Vector2 rayDirection = m_MoveVector;
-
-        RaycastHit2D[] hit = new RaycastHit2D[2];
-        int count = rb2D.Cast(rayDirection, hit, collisionRadius);
-
-        for(int i = 0; i < count; i++)
+        if (bounceObject.tag.Equals("Wall"))
         {
-            if (hit[i].collider.gameObject.tag.Equals("Wall"))
-            {
-                ChangeBallDirection(hit[i].normal);
-                break;
-            }
-
-            if (hit[i].collider.gameObject.tag.Equals("Box"))
-            {
-                ChangeBallDirection(hit[i].normal);
-                hit[i].collider.GetComponent<Box>().BoxHit();
-                break;
-            }
+            isLoopBreak = true;
+            return;
         }
-
-        transform.Translate(m_MoveVector * m_MoveSpeed * Time.fixedDeltaTime);
+        if (bounceObject.tag.Equals("Box"))
+        { 
+             bounceObject.GetComponent<Box>().BoxHit();
+             isLoopBreak = true;
+             return;
+        }
+        isLoopBreak = false;
     }
+
     /// <summary>
     /// 공 이동 함수. 한번만 불러주면 알아서 이동함.
     /// </summary>
@@ -107,8 +100,7 @@ public class Ball : MonoBehaviour
     /// 이동속도
     public void BallMove(Vector2 moveVector, float moveSpeed)
     {
-        m_MoveSpeed = moveSpeed;
-        m_MoveVector = moveVector;
+        bounceComponent.Velocity = moveVector * moveSpeed;
 
         BallState = BALL_STATE.BALL_MOVE;
     }
@@ -137,7 +129,10 @@ public class Ball : MonoBehaviour
             CollisionFloor(collision.gameObject);
 
         if (collision.gameObject.tag.Equals("Item"))
-            GameManager.Instance.;
+        {
+            GameManager.Instance.AddBallCount();
+            Destroy(collision.gameObject);
+        }
     }
 
     private void CollisionFloor(GameObject collision)
@@ -172,17 +167,5 @@ public class Ball : MonoBehaviour
                 BallState = BALL_STATE.BALL_STOP;
             }
         }
-    }
-
-    /// <summary>
-    /// 공의 방향을 바꾸는 함수
-    /// </summary>
-    /// <param name="normalVector"></param>
-    /// 닿은 타겟의 법선 벡터
-    private void ChangeBallDirection(Vector2 normalVector)
-    {
-        // http://rapapa.net/?p=673 - 반사공식 사이트
-        // V - 2 * N * (V dot N)    - 반사공식
-        m_MoveVector = Vector2.Reflect(m_MoveVector, normalVector);
     }
 }

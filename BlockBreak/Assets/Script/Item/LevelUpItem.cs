@@ -22,4 +22,9 @@ public class LevelUpItem : MonoBehaviour
     {
         
     }
+
+    private void OnDestroy()
+    {
+        GameManager.Instance.DestroyItem(gameObject);
+    }
 }
