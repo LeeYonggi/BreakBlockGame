@@ -18,6 +18,15 @@ public class PredictBall : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+    }
+
+    private void FixedUpdate()
+    {
+        StartPrediction();
+    }
+
+    public void StartPrediction()
+    {
         if (BallManager.Instance.FirstBall == null) return;
 
         Vector2 firstPosition = BallManager.Instance.FirstBall.transform.position;
@@ -34,9 +43,6 @@ public class PredictBall : MonoBehaviour
 
     void MakePrediction(Vector2 direction)
     {
-        //Ray2D ray = new Ray2D(transform.position, new Vector2(0, 0));
-        //RaycastHit2D[] hit = Physics2D.RaycastAll(ray.origin, ray.direction, 0);
-
         RaycastHit2D[] hit = new RaycastHit2D[10];
         int result = rb2D.Cast(direction, hit, circleCollider2D.radius);
 
@@ -44,8 +50,11 @@ public class PredictBall : MonoBehaviour
         {
             if (hit[i].collider.gameObject.tag == "Wall")
             {
-                //Debug.Log("It's end line!");
-                //Debug.Log(transform.position);
+                GameObject wall = hit[i].collider.gameObject;
+
+                BoxCollider2D collider = wall.GetComponent<BoxCollider2D>();
+
+                transform.position = GetBoxColliderOutLine(hit[i].normal, collider.transform.position, collider);
                 return;
             }
         }
@@ -55,12 +64,21 @@ public class PredictBall : MonoBehaviour
         return;
     }
 
+    Vector2 GetBoxColliderOutLine(Vector2 colliderNormal, Vector2 wallPosition, BoxCollider2D collider)
+    {
+        wallPosition += collider.offset;
+
+        Vector2 basicPosition = new Vector2(Mathf.Abs(colliderNormal.y), Mathf.Abs(colliderNormal.x)) * rb2D.transform.position;
+
+        return colliderNormal * collider.size * 0.5f + wallPosition + basicPosition + colliderNormal * circleCollider2D.radius;
+    }
+
     void MoveDirection(Vector2 direction)
     {
         Vector3 movePosition = new Vector3( 0, 0, 0 );
 
-        movePosition.x = direction.x * circleCollider2D.radius;
-        movePosition.y = direction.y * circleCollider2D.radius;
+        movePosition.x = direction.x * circleCollider2D.radius * 2;
+        movePosition.y = direction.y * circleCollider2D.radius * 2;
 
         transform.position = transform.position + movePosition;
         rb2D.position = transform.position;

@@ -57,7 +57,7 @@ public class BallManager : MonoBehaviour
     public GameObject firstBall = null;                 // 첫번째 공
 
     [SerializeField]
-    private GameObject predictBall = null;              // 예측하는 공
+    private GameObject guidLine = null;              // 가이드 라인
 
     [SerializeField]
     private GameObject ballPrefab = null;               // 공 프리펩
@@ -149,11 +149,16 @@ public class BallManager : MonoBehaviour
         return Camera.main.ScreenToWorldPoint(Input.mousePosition);
     }
 
+    /// <summary>
+    /// 공이 날아가는 화살표 표시 함수
+    /// </summary>
+    /// <param name="v1"></param>
+    /// <param name="v2"></param>
     void ActiveArrowRotate(Vector2 v1, Vector2 v2)
     {
         if (IsMousePressPossible() == false) return;
 
-        predictBall.SetActive(true);
+        guidLine.SetActive(true);
 
         arrow.SetActive(true);
 
@@ -166,7 +171,7 @@ public class BallManager : MonoBehaviour
     void DisableArrow()
     {
         arrow.SetActive(false);
-        predictBall.SetActive(false);
+        guidLine.SetActive(false);
     }
 
     bool IsMousePressPossible()

@@ -74,7 +74,6 @@ public class Ball : MonoBehaviour
         }
     }
 
-
     public void BounceCollision(GameObject bounceObject, out bool isLoopBreak)
     {
         if (bounceObject.tag.Equals("Wall"))
@@ -154,18 +153,17 @@ public class Ball : MonoBehaviour
     /// </summary>
     private void FollowFirstBall()
     {
-        if(BallManager.Instance.FirstBall)
+        if (BallManager.Instance.FirstBall == null) return;
+
+        GameObject firstBall = BallManager.Instance.FirstBall;
+
+        transform.position = Vector2.Lerp(transform.position, firstBall.transform.position, Time.deltaTime * 8);
+
+        if(Vector2.Distance(transform.position, firstBall.transform.position) < 0.2f)
         {
-            GameObject firstBall = BallManager.Instance.FirstBall;
+            transform.position = firstBall.transform.position;
 
-            transform.position = Vector2.Lerp(transform.position, firstBall.transform.position, Time.deltaTime * 8);
-
-            if(Vector2.Distance(transform.position, firstBall.transform.position) < 0.2f)
-            {
-                transform.position = firstBall.transform.position;
-
-                BallState = BALL_STATE.BALL_STOP;
-            }
+            BallState = BALL_STATE.BALL_STOP;
         }
     }
 }
