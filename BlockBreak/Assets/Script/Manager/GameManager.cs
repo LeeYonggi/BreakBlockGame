@@ -16,9 +16,10 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GameObject levelUpItem = null;      // 레벨업 아이템
 
-    int nowCount = 9000;                           // 박스 hp
+    [SerializeField]
+    int nowCount = 20;                           // 박스 hp
 
-    private static readonly int MAX_LINEBOX = 9;
+    private static readonly int MAX_LINEBOX = 10;
 
     private List<GameObject> boxPacks = new List<GameObject>();
 
@@ -36,6 +37,14 @@ public class GameManager : MonoBehaviour
 
     private GAME_STEP gameStep = GAME_STEP.IDLE;
 
+    private void Awake()
+    {
+        GameObject[] objectBuffer = GameObject.FindGameObjectsWithTag("Box");
+
+        for (int i = 0; i < objectBuffer.Length; i++)
+            boxPacks.Add(objectBuffer[i]);
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -43,9 +52,6 @@ public class GameManager : MonoBehaviour
             Instance = this;
         else if (Instance == this)
             GameObject.Destroy(gameObject);
-
-        CreateBox();
-        CreateItem();
 
         nowCount += 1;
 
@@ -122,7 +128,7 @@ public class GameManager : MonoBehaviour
         else
             box = GameObject.Instantiate(triangleBoxPrefab, transform);
 
-        box.transform.position = new Vector2(random * 0.6f - 2.45f, 3.15f);
+        box.transform.position = new Vector2(random * 0.6f - 2.4f, 3.3f);
 
         boxPacks.Add(box);
 
@@ -143,7 +149,7 @@ public class GameManager : MonoBehaviour
 
         GameObject item = GameObject.Instantiate(levelUpItem);
 
-        item.transform.position = new Vector2(random * 0.6f - 2.45f, 3.15f);
+        item.transform.position = new Vector2(random * 0.6f - 2.4f, 3.3f);
 
         itemPacks.Add(item);
 

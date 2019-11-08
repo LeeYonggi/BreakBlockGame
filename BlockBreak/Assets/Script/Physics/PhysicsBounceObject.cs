@@ -14,6 +14,7 @@ public class PhysicsBounceObject : MonoBehaviour
     private ContactFilter2D contactFilter;
     private Rigidbody2D rb2D = null;
     private RaycastHit2D[] hitBuffer = new RaycastHit2D[10];
+    private float delayDistance = 0.0f;
 
     /// <summary>
     /// 공이 튕길 때 불러주는 함수
@@ -53,6 +54,9 @@ public class PhysicsBounceObject : MonoBehaviour
     {
         Vector2 deltaPosition = velocity * Time.deltaTime;
 
+        deltaPosition += velocity * delayDistance * Time.deltaTime;
+        delayDistance = 0;
+
         Movement(deltaPosition);
     }
 
@@ -63,25 +67,31 @@ public class PhysicsBounceObject : MonoBehaviour
     /// 움직일 방향
     private void Movement(Vector2 move)
     {
+        // move 벡터의 크기를 distance에 저장
         float distance = move.magnitude;
 
         if(distance > minMoveDistance)
         {
+            // Rigidbody2D cast로 충돌 물체를 받아옴
             int count = rb2D.Cast(move, contactFilter, hitBuffer, distance + shellRadius);
 
             for(int i = 0; i < count; i++)
             {
+                // 이전에 충돌한 물체와 또다시 충돌 시 예외처리
                 if (hitBuffer[i].collider.gameObject.Equals(preBounceObject))
                     continue;
 
                 Vector2 currentNormal = hitBuffer[i].normal;
 
+                // 튕기는 이벤트 처리
                 OnBounce(hitBuffer[i].collider.gameObject, out bool isLoopBreak);
-                
-                ChangeDirection(hitBuffer[i].normal);
 
+                // 반사 처리
+                velocity = ChangeDirection(velocity, hitBuffer[i].normal);
+
+                // distance 보정
                 float modifiedDistance = hitBuffer[i].distance - shellRadius;
-                distance = modifiedDistance < distance ? modifiedDistance : distance;
+                distance = GetModifiedDistance(distance, modifiedDistance);
 
                 preBounceObject = hitBuffer[i].collider.gameObject;
 
@@ -89,7 +99,7 @@ public class PhysicsBounceObject : MonoBehaviour
                     break;
             }
         }
-
+        // 이동
         MoveRbPosition(move.normalized, distance);
     }
 
@@ -108,12 +118,38 @@ public class PhysicsBounceObject : MonoBehaviour
     /// <summary>
     /// 오브젝트의 velocity를 닿은 면에 반사시켜주는 함수
     /// </summary>
+    /// <param name="direction"></param>
+    /// 방향
     /// <param name="normalVector"></param>
     /// 닿은 타겟의 법선 벡터
-    private void ChangeDirection(Vector2 normalVector)
+    public static Vector2 ChangeDirection(Vector2 direction, Vector2 normalVector)
     {
         // http://rapapa.net/?p=673 - 반사공식 사이트
         // V - 2 * N * (V dot N)    - 반사공식
-        velocity = Vector2.Reflect(velocity, normalVector);
+        return Vector2.Reflect(direction, normalVector);
+    }
+
+    /// <summary>
+    /// 보정한 거리를 반환
+    /// </summary>
+    /// <param name="basicDistance"></param>
+    /// 원래 거리
+    /// <param name="modifiedDistance"></param>
+    /// 보정할 거리
+    /// <returns></returns>
+    private float GetModifiedDistance(float basicDistance, float modifiedDistance)
+    {
+        if(modifiedDistance < basicDistance)
+        {
+            delayDistance += basicDistance - modifiedDistance;
+            return modifiedDistance;
+        }
+        delayDistance = 0;
+        return basicDistance;
+    }
+
+    private void OnEnable()
+    {
+        preBounceObject = null;
     }
 }

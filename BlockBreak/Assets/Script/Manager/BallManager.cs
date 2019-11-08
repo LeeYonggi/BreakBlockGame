@@ -30,8 +30,9 @@ public class BallManager : MonoBehaviour
     /// </summary>
     private Vector2 secondPosition = new Vector2(0, 0); 
 
-    private float shootDelay = 0.01f;                   // 공 발사 딜레이
+    private float shootDelay = 0.05f;                   // 공 발사 딜레이
     private float shootDelayCount = 0.0f;               // 현재 공 발사 딜레이
+    [SerializeField]
     private float shootSpeed = 6.0f;                    // 공 스피드
     private Vector2 ballMoveVector = new Vector2(0, 0); // 공 방향벡터
 
@@ -52,18 +53,21 @@ public class BallManager : MonoBehaviour
     /// <summary>
     /// 첫번째 공 좌표
     /// </summary>
-    private readonly Vector2 firstBallPosition = new Vector2(0, -2.8f);
+    private readonly Vector2 firstBallPosition = new Vector2(0, -3.0f);
 
-    public GameObject firstBall = null;                 // 첫번째 공
-
-    [SerializeField]
-    private GameObject guidLine = null;              // 가이드 라인
+    private GameObject firstBall = null;                 // 첫번째 공
 
     [SerializeField]
     private GameObject ballPrefab = null;               // 공 프리펩
 
     [SerializeField]
-    private GameObject arrow = null;                    // 화살표 오브젝트
+    private GameObject guidLinePrefab = null;           // 가이드 라인 프리펩
+
+    [SerializeField]
+    private int maxBallCount = 1;                       // 공의 개수
+
+    private GuidLine guidLine = null;                   // 가이드 라인
+
 
 
     #region Property
@@ -71,6 +75,9 @@ public class BallManager : MonoBehaviour
     public GameObject FirstBall { get => firstBall; set => firstBall = value; }
     public Vector2 FirstPosition { get => firstPosition; set => firstPosition = value; }
     public Vector2 SecondPosition { get => secondPosition; set => secondPosition = value; }
+    public List<Ball> BallPacks { get => ballPacks; set => ballPacks = value; }
+
+    public Vector2 FirstBallPosition => firstBallPosition;
     #endregion
 
     public delegate void ActiveControll();
@@ -107,13 +114,13 @@ public class BallManager : MonoBehaviour
             GameObject.Destroy(gameObject);
 
         // 처음 공 생성
-        for(int i = 0; i < 100; i++)
+        for(int i = 0; i < maxBallCount; i++)
             CreateBall();
 
         FirstBall = ballPacks[0].gameObject;
 
         OnMouseUp += FireBallInitalize;
-        OnMouseUp += DisableArrow;
+        OnMouseUp += DisableGuidLine;
         OnMouseUp += StepInitialize;
     }
 
@@ -150,28 +157,29 @@ public class BallManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 공이 날아가는 화살표 표시 함수
+    /// 공이 날아가는 가이드라인 표시 함수
     /// </summary>
     /// <param name="v1"></param>
     /// <param name="v2"></param>
-    void ActiveArrowRotate(Vector2 v1, Vector2 v2)
+    void ActiveGuidLine(Vector2 pos)
     {
         if (IsMousePressPossible() == false) return;
+        if (guidLine == null)
+        {
+            guidLine = GameObject.Instantiate(guidLinePrefab).GetComponent<GuidLine>();
+        }
 
-        guidLine.SetActive(true);
-
-        arrow.SetActive(true);
-
-        Vector3 euler = new Vector3(0, 0, Mathf.Atan2(v2.y - v1.y, v2.x - v1.x) * Mathf.Rad2Deg - 90);
-        arrow.transform.rotation = Quaternion.Euler(euler);
-
-        arrow.transform.position = ballPacks[0].transform.position;
+        guidLine.transform.position = pos;
+        guidLine.MaxLength = 1.2f;
+        guidLine.GuidDirection = secondPosition - firstPosition;
     }
 
-    void DisableArrow()
+    void DisableGuidLine()
     {
-        arrow.SetActive(false);
-        guidLine.SetActive(false);
+        if (guidLine == null) return;
+        
+        GameObject.Destroy(guidLine.gameObject);
+        guidLine = null;
     }
 
     bool IsMousePressPossible()
@@ -248,7 +256,7 @@ public class BallManager : MonoBehaviour
             secondPosition.y = firstPosition.y + Mathf.Sin((180 - limitDegree) * Mathf.Deg2Rad);
         }
 
-        ActiveArrowRotate(firstPosition, secondPosition);
+        ActiveGuidLine(firstBall.transform.position);
     }
 
     void MouseUp(out KEY_STATE keyState)
@@ -292,15 +300,20 @@ public class BallManager : MonoBehaviour
 
             if(nowShootindex >= ballPacks.Count)
             {
-                shootDelayCount = 0.0f;
-
-                m_FireState = FIRE_STATE.IDLE;
+                StopBallLoop();
             }
             else
                 shootDelayCount = shootDelay;
         }
 
         shootDelayCount -= Time.fixedDeltaTime;
+    }
+
+    void StopBallLoop()
+    {
+        shootDelayCount = 0.0f;
+
+        m_FireState = FIRE_STATE.IDLE;
     }
 
     // 모두 공이 멈추었는지 반환해주는 함수.
@@ -321,5 +334,30 @@ public class BallManager : MonoBehaviour
         if (m_FireState.Equals(FIRE_STATE.FIRE_ACTIVATION)) return;
 
         CreateBall();
+    }
+
+    public void BallReturn()
+    {
+        StopBallLoop();
+
+        FirstBall = FindStopBall();
+
+        for (int i = 0; i < ballPacks.Count; i++)
+            ballPacks[i].BallState = Ball.BALL_STATE.BALL_FOLLOW;
+
+    }
+
+    public GameObject FindStopBall()
+    {
+        for (int i = 0; i < ballPacks.Count; i++)
+        {
+            if (ballPacks[i].BallState.Equals(Ball.BALL_STATE.BALL_STOP))
+            {
+                return ballPacks[i].gameObject; ;
+            }
+        }
+
+        ballPacks[0].transform.position = FirstBallPosition;
+        return ballPacks[0].gameObject;
     }
 }

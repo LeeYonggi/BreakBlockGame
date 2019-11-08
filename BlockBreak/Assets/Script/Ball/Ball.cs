@@ -153,15 +153,16 @@ public class Ball : MonoBehaviour
     /// </summary>
     private void FollowFirstBall()
     {
-        if (BallManager.Instance.FirstBall == null) return;
+        Vector2 firstBallPos = BallManager.Instance.FirstBallPosition;
 
-        GameObject firstBall = BallManager.Instance.FirstBall;
+        if (BallManager.Instance.FirstBall)
+            firstBallPos = BallManager.Instance.FirstBall.transform.position;
 
-        transform.position = Vector2.Lerp(transform.position, firstBall.transform.position, Time.deltaTime * 8);
+        transform.position = Vector2.Lerp(transform.position, firstBallPos, Time.deltaTime * 8);
 
-        if(Vector2.Distance(transform.position, firstBall.transform.position) < 0.2f)
+        if(Vector2.Distance(transform.position, firstBallPos) < 0.2f)
         {
-            transform.position = firstBall.transform.position;
+            transform.position = firstBallPos;
 
             BallState = BALL_STATE.BALL_STOP;
         }

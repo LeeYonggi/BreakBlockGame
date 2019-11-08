@@ -7,8 +7,9 @@ public class PredictBall : MonoBehaviour
     private Rigidbody2D rb2D = null;
     private CircleCollider2D circleCollider2D = null;
 
+
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         rb2D = GetComponent<Rigidbody2D>();
 
@@ -22,26 +23,32 @@ public class PredictBall : MonoBehaviour
 
     private void FixedUpdate()
     {
-        StartPrediction();
+
     }
 
-    public void StartPrediction()
+    /// <summary>
+    /// 공의 경로 예측을 시작합니다
+    /// </summary>
+    /// <param name="firstPosition"></param>
+    /// 첫 좌표
+    /// <param name="direction"></param>
+    /// 예측할 방향
+    /// <returns></returns>
+    /// 반사 방향
+    public Vector2 StartPrediction(Vector2 firstPosition, Vector2 direction)
     {
-        if (BallManager.Instance.FirstBall == null) return;
+        if (BallManager.Instance.FirstBall == null) return new Vector2(0, 0);
 
-        Vector2 firstPosition = BallManager.Instance.FirstBall.transform.position;
         transform.position = firstPosition;
         rb2D.position = transform.position;
 
-        Vector2 direction = BallManager.Instance.SecondPosition - BallManager.Instance.FirstPosition;
-
         direction.Normalize();
 
-        MakePrediction(direction);
+        return MakePrediction(direction);
     }
 
 
-    void MakePrediction(Vector2 direction)
+    Vector2 MakePrediction(Vector2 direction)
     {
         RaycastHit2D[] hit = new RaycastHit2D[10];
         int result = rb2D.Cast(direction, hit, circleCollider2D.radius);
@@ -55,13 +62,15 @@ public class PredictBall : MonoBehaviour
                 BoxCollider2D collider = wall.GetComponent<BoxCollider2D>();
 
                 transform.position = GetBoxColliderOutLine(hit[i].normal, collider.transform.position, collider);
-                return;
+
+                return PhysicsBounceObject.ChangeDirection(direction, hit[i].normal);
             }
+            if (hit[i].collider.gameObject.tag.Equals("Floor"))
+                return new Vector2(0, 0);
         }
 
         MoveDirection(direction);
-        MakePrediction(direction);
-        return;
+        return MakePrediction(direction);
     }
 
     Vector2 GetBoxColliderOutLine(Vector2 colliderNormal, Vector2 wallPosition, BoxCollider2D collider)

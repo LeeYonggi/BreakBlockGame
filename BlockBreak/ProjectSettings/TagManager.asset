@@ -47,3 +47,18 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Ball
+    uniqueID: 1220648305
+    locked: 0
+  - name: Box
+    uniqueID: 53446425
+    locked: 0
+  - name: BoxUI
+    uniqueID: 2714872623
+    locked: 0
+  - name: GuidLine
+    uniqueID: 2562456035
+    locked: 0
+  - name: PredictBall
+    uniqueID: 1650723849
+    locked: 0

@@ -7,22 +7,35 @@ public class GuidLine : MonoBehaviour
     [SerializeField]
     private GameObject spriteMask = null;
     [SerializeField]
-    private GameObject guidSprite = null;
+    private Sprite guidSprite = null;
     [SerializeField]
-    private GameObject predictBall = null;
+    private GameObject predictBallPrefab = null;
+    [SerializeField]
+    private GameObject guidLinePrefab = null;
 
-    private List<PredictBall> predictBalls = new List<PredictBall>();
+    private PredictBall predictBall = null;
 
-    private SpriteRenderer spRenderer = null;  
+    private Vector2 guidDirection = new Vector2(0, 0);
+
+    private float guidDistance = 0.0f;
+
+    [SerializeField]
+    private float maxLength = 1.2f;
+
+    public float MaxLength { get => maxLength; set => maxLength = value; }
+    public Vector2 GuidDirection { get => guidDirection; set => guidDirection = value; }
+
+    private GuidLine nextGuidLine = null;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        spRenderer = guidSprite.GetComponent<SpriteRenderer>();
+        guidDistance = guidSprite.bounds.size.y;
 
-        for(int i = 0; i < 1; i++)
-            predictBalls.Add(GameObject.Instantiate(predictBall).GetComponent<PredictBall>());
+        predictBall = GameObject.Instantiate(predictBallPrefab).GetComponent<PredictBall>();
+
+        GuidLineUpdate();
     }
 
     // Update is called once per frame
@@ -33,31 +46,63 @@ public class GuidLine : MonoBehaviour
 
     private void FixedUpdate()
     {
+        GuidLineUpdate();
+    }
+
+    private void GuidLineUpdate()
+    {
         if (BallManager.Instance.FirstBall == null) return;
 
-        predictBalls[0].gameObject.SetActive(true);
-        predictBalls[0].StartPrediction();
+        predictBall.gameObject.SetActive(true);
 
-        transform.position = BallManager.Instance.FirstBall.transform.position;
+        Vector2 reflectVector = predictBall.StartPrediction(transform.position, guidDirection);
 
-        Vector2 predictBallPos = predictBalls[0].transform.position;
+        Vector2 predictBallPos = predictBall.transform.position;
 
-        float predictDistance = Vector2.Distance(predictBallPos, transform.position);
+        spriteMask.transform.localScale = new Vector2(1, GetMaskDistance(predictBallPos, guidDistance));
 
-        float spriteDistance = spRenderer.bounds.size.y;
-
-        spriteMask.transform.localScale = new Vector2(1, predictDistance / spriteDistance);
-
-        float angle = Mathf.Atan2(transform.position.y - predictBalls[0].transform.position.y,
-                                  transform.position.x - predictBalls[0].transform.position.x) * Mathf.Rad2Deg + 90;
+        float angle = Mathf.Atan2(GuidDirection.y, GuidDirection.x) * Mathf.Rad2Deg - 90;
 
         Vector3 euler = new Vector3(0, 0, angle);
         transform.rotation = Quaternion.Euler(euler);
+
+
+        if (maxLength < 1.0f)
+            predictBall.gameObject.SetActive(false);
+        else
+            ActiveNextGuidLine(predictBallPos, reflectVector);
     }
 
-    private void OnDisable()
+    private void ActiveNextGuidLine(Vector2 startPos, Vector2 direction)
     {
-        for (int i = 0; i < predictBalls.Count; i++)
-            predictBalls[i].gameObject.SetActive(false);
+        if (direction.magnitude <= 0.0f) return;
+
+        if (nextGuidLine == null)
+        {
+            nextGuidLine = GameObject.Instantiate(guidLinePrefab).GetComponent<GuidLine>();
+            nextGuidLine.maxLength = maxLength - 1.0f;
+        }
+
+        nextGuidLine.GuidDirection = direction;
+        nextGuidLine.transform.position = startPos;
+    }
+
+    float GetMaskDistance(Vector2 endPos, float spriteDistance)
+    {
+        float predictDistance = Vector2.Distance(endPos, transform.position) / spriteDistance;
+
+        if (maxLength < 1.0f)
+            return maxLength > predictDistance ? predictDistance : maxLength;
+
+        return predictDistance;
+    }
+
+    private void OnDestroy()
+    {
+        if(predictBall)
+            Destroy(predictBall.gameObject);
+
+        if(nextGuidLine)
+            Destroy(nextGuidLine.gameObject);
     }
 }

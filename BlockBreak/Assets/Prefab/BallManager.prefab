@@ -43,7 +43,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bad32c18864b43842bd3a6ee2b4ef0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shootSpeed: 6
   limitDegree: 20
+  firstBall: {fileID: 0}
   ballPrefab: {fileID: 1959521517023443002, guid: 7b04241150e83074b83b3ecc61647f75,
     type: 3}
-  arrow: {fileID: 0}
+  guidLinePrefab: {fileID: 3330849690998654683, guid: 4cfce083411eb134193c2430f742e3db,
+    type: 3}
