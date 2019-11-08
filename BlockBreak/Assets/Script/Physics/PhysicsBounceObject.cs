@@ -74,6 +74,7 @@ public class PhysicsBounceObject : MonoBehaviour
         {
             // Rigidbody2D cast로 충돌 물체를 받아옴
             int count = rb2D.Cast(move, contactFilter, hitBuffer, distance + shellRadius);
+            bool isReflectEnd = false;
 
             for(int i = 0; i < count; i++)
             {
@@ -81,27 +82,31 @@ public class PhysicsBounceObject : MonoBehaviour
                 if (hitBuffer[i].collider.gameObject.Equals(preBounceObject))
                     continue;
 
-                Vector2 currentNormal = hitBuffer[i].normal;
+                if (isReflectEnd == false)
+                {
+                    Vector2 currentNormal = hitBuffer[i].normal;
+
+                    // 반사 처리
+                    velocity = ChangeDirection(velocity, hitBuffer[i].normal);
+
+                    // distance 보정
+                    float modifiedDistance = hitBuffer[i].distance - shellRadius;
+                    distance = GetModifiedDistance(distance, modifiedDistance);
+
+                    preBounceObject = hitBuffer[i].collider.gameObject;
+                }
 
                 // 튕기는 이벤트 처리
                 OnBounce(hitBuffer[i].collider.gameObject, out bool isLoopBreak);
 
-                // 반사 처리
-                velocity = ChangeDirection(velocity, hitBuffer[i].normal);
-
-                // distance 보정
-                float modifiedDistance = hitBuffer[i].distance - shellRadius;
-                distance = GetModifiedDistance(distance, modifiedDistance);
-
-                preBounceObject = hitBuffer[i].collider.gameObject;
-
                 if (isLoopBreak)
-                    break;
+                    isReflectEnd = isLoopBreak;
             }
         }
         // 이동
         MoveRbPosition(move.normalized, distance);
     }
+
 
     /// <summary>
     /// 리지드바디 포지션을 움직여주는 함수.

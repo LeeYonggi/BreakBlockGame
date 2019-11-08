@@ -29,7 +29,7 @@ public class BallManager : MonoBehaviour
     /// 손 땠을 시 마우스 좌표
     /// </summary>
     private Vector2 secondPosition = new Vector2(0, 0); 
-
+    [SerializeField]
     private float shootDelay = 0.05f;                   // 공 발사 딜레이
     private float shootDelayCount = 0.0f;               // 현재 공 발사 딜레이
     [SerializeField]
@@ -353,7 +353,7 @@ public class BallManager : MonoBehaviour
         {
             if (ballPacks[i].BallState.Equals(Ball.BALL_STATE.BALL_STOP))
             {
-                return ballPacks[i].gameObject; ;
+                return ballPacks[i].gameObject;
             }
         }
 

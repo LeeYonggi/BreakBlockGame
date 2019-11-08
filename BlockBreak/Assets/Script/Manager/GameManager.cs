@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 
     static public GameManager Instance { get => instance; set => instance = value; }
     public GAME_STEP GameStep { get => gameStep; set => gameStep = value; }
+    public TIME_STATE TimeState { get => timeState; set => timeState = value; }
 
     [SerializeField]
     private GameObject boxPrefab = null;        // 박스 프리펩
@@ -18,6 +19,15 @@ public class GameManager : MonoBehaviour
 
     [SerializeField]
     int nowCount = 20;                           // 박스 hp
+
+    public enum TIME_STATE
+    {
+        ATTACH_NONE,
+        ATTACH_DOUBLE,
+        ATTACH_QUADRUPLE
+    }
+
+    private TIME_STATE timeState = TIME_STATE.ATTACH_NONE;
 
     private static readonly int MAX_LINEBOX = 10;
 
@@ -170,5 +180,30 @@ public class GameManager : MonoBehaviour
     public void AddBallCount()
     {
         nextAddBall += 1;
+    }
+
+    public void GameSpeedUp()
+    {
+        Time.timeScale = ChangeTimeState();
+    }
+
+    private float ChangeTimeState()
+    {
+        if(timeState.Equals(TIME_STATE.ATTACH_NONE))
+        {
+            timeState = TIME_STATE.ATTACH_DOUBLE;
+            return 2.0f;
+        }
+        if (timeState.Equals(TIME_STATE.ATTACH_DOUBLE))
+        {
+            timeState = TIME_STATE.ATTACH_QUADRUPLE;
+            return 4.0f;
+        }
+        if (timeState.Equals(TIME_STATE.ATTACH_QUADRUPLE))
+        {
+            timeState = TIME_STATE.ATTACH_NONE;
+            return 1.0f;
+        }
+        return 1.0f;
     }
 }
