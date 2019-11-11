@@ -6,9 +6,11 @@ public class GameManager : MonoBehaviour
 {
     static private GameManager instance = null;
 
+    #region Property
     static public GameManager Instance { get => instance; set => instance = value; }
     public GAME_STEP GameStep { get => gameStep; set => gameStep = value; }
     public TIME_STATE TimeState { get => timeState; set => timeState = value; }
+    #endregion 
 
     [SerializeField]
     private GameObject boxPrefab = null;        // 박스 프리펩
@@ -18,7 +20,7 @@ public class GameManager : MonoBehaviour
     private GameObject levelUpItem = null;      // 레벨업 아이템
 
     [SerializeField]
-    int nowCount = 20;                           // 박스 hp
+    int nowCount = 20;                          // 박스 hp
 
     public enum TIME_STATE
     {
@@ -49,19 +51,20 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        GameObject[] objectBuffer = GameObject.FindGameObjectsWithTag("Box");
-
-        for (int i = 0; i < objectBuffer.Length; i++)
-            boxPacks.Add(objectBuffer[i]);
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
         if (Instance == null)
             Instance = this;
         else if (Instance == this)
             GameObject.Destroy(gameObject);
+    }
+
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        GameObject[] objectBuffer = GameObject.FindGameObjectsWithTag("Box");
+
+        for (int i = 0; i < objectBuffer.Length; i++)
+            boxPacks.Add(objectBuffer[i]);
 
         nowCount += 1;
 
@@ -103,16 +106,21 @@ public class GameManager : MonoBehaviour
 
         nextAddBall = 0;
 
-        int random = Random.Range(1, 7);
-
-        for (int i = 0; i < random; i++)
-            CreateBox();
-
-        CreateItem();
+        //CreateLineBox();
 
         GameStep = GAME_STEP.IDLE;
 
         nowCount += 1;
+    }
+
+    void CreateLineBox()
+    {
+        int random = Random.Range(1, 7);
+        
+        //for (int i = 0; i < random; i++)
+        //    CreateBox();
+        
+        CreateItem();
     }
 
     void ChangePlay()
@@ -120,31 +128,19 @@ public class GameManager : MonoBehaviour
         GameStep = GAME_STEP.PLAY;
     }
 
-    void CreateBox()
+    public void CreateBox(MapData data)
     {
-        int random = Random.Range(1, MAX_LINEBOX);
-
-        if (nowBoxLine[random] != null)
-        {
-            CreateBox();
-            return;
-        }
-
-        int boxRandom = Random.Range(1, 10);
         GameObject box = null;
 
-        if (boxRandom < 10)
-            box = GameObject.Instantiate(boxPrefab, transform);
-        else
-            box = GameObject.Instantiate(triangleBoxPrefab, transform);
+        box = GameObject.Instantiate(boxPrefab, transform);
 
-        box.transform.position = new Vector2(random * 0.6f - 2.4f, 3.3f);
+        box.transform.position = new Vector2(data.pos.X * 0.6f - 2.4f, 3.3f - data.pos.Y * 0.6f);
 
         boxPacks.Add(box);
 
-        box.GetComponent<Box>().BoxStatus = new BoxStatus(nowCount);
+        box.GetComponent<Box>().BoxStatus = new BoxStatus(data.status.boxCount);
 
-        nowBoxLine[random] = box;
+        nowBoxLine[data.pos.X] = box;
     }
 
     void CreateItem()
