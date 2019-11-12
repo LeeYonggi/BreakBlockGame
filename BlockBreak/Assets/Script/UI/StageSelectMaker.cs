@@ -9,28 +9,40 @@ public class StageSelectMaker : MonoBehaviour
     [SerializeField]
     private GameObject selectUI = null;
 
+    private UIWrapContent wrapScript = null;
+
     private UIGrid uiGrid = null;
 
     private void Awake()
     {
         uiGrid = GetComponent<UIGrid>();
 
+        int count = 1;
+
         for (int i = 1; i <= stageCount; i++)
         {
             GameObject obj = GameObject.Instantiate(selectUI, transform);
 
-            UILabel uiLabel = obj.GetComponentInChildren<UILabel>();
+            for (int child = 0; child < obj.transform.childCount; ++child)
+            {
+                StageSelectUI uiLabel = obj.transform.GetChild(child).GetComponent<StageSelectUI>();
 
-            uiLabel.text = i.ToString();
+                uiLabel.StageNumber = count;
+
+                count += 1;
+            }
         }
 
-        uiGrid.enabled = false;
+        //uiGrid.enabled = false;
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        uiGrid.enabled = true;
+        //uiGrid.enabled = true;
+
+        //wrapScript = gameObject.AddComponent<UIWrapContent>();
+
     }
 
     // Update is called once per frame

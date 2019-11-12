@@ -52,7 +52,7 @@ public static class StageParser
                     for (int i = 0; i < mapSize.X; i++)
                         mapLayer[nowLineNumber, i] = CreateMapData(nowLineNumber, i, int.Parse(dataLine[i]));
                 }
-                if(layerCount == 2)
+                if (layerCount == 2)
                 {
                     for (int i = 0; i < mapSize.X; i++)
                         mapLayer[nowLineNumber, i].status.boxCount = int.Parse(dataLine[i]);

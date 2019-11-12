@@ -84,7 +84,10 @@ public class UIWrapContent : MonoBehaviour
 	/// Callback triggered by the UIPanel when its clipping region moves (for example when it's being scrolled).
 	/// </summary>
 
-	protected virtual void OnMove (UIPanel panel) { WrapContent(); }
+	protected virtual void OnMove (UIPanel panel)
+    {
+        WrapContent(); 
+    }
 
 	/// <summary>
 	/// Immediately reposition all children.
@@ -252,7 +255,7 @@ public class UIWrapContent : MonoBehaviour
 					{
 						t.localPosition = pos;
 						UpdateItem(t, i);
-					}
+                    }
 					else allWithinRange = false;
 				}
 				else if (distance > extents)
@@ -274,8 +277,8 @@ public class UIWrapContent : MonoBehaviour
 				if (cullContent)
 				{
 					distance += mPanel.clipOffset.y - mTrans.localPosition.y;
-					if (!UICamera.IsPressed(t.gameObject))
-						NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
+                    if (!UICamera.IsPressed(t.gameObject))
+                        NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
 				}
 			}
 		}
