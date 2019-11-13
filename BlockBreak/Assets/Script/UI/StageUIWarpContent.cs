@@ -5,6 +5,8 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Wrap Content")]
 public class StageUIWarpContent : UIWrapContent
 {
+    private Transform[] uiTable = null;
+
     [ContextMenu("Sort Based on Scroll Movement")]
     public override void SortBasedOnScrollMovement()
     {
@@ -12,7 +14,7 @@ public class StageUIWarpContent : UIWrapContent
 
         // Cache all children and place them in order
         mChildren.Clear();
-        // 여기가 문제인듯
+        
         for (int i = 0; i < mTrans.childCount; ++i)
         {
             Transform t = mTrans.GetChild(i);
@@ -20,6 +22,9 @@ public class StageUIWarpContent : UIWrapContent
             mChildren.Add(t);
         }
 
+        uiTable = new Transform[mTrans.childCount];
+
+        ResetChildPositions();
         // Sort the list of children so that they are in order
         if (mHorizontal) mChildren.Sort(UIGrid.SortHorizontal);
         else mChildren.Sort(UIGrid.SortVertical);
@@ -94,7 +99,43 @@ public class StageUIWarpContent : UIWrapContent
             float min = corners[0].y - itemSize;
             float max = corners[2].y + itemSize;
 
+            ClearUITable();
             for (int i = 0, imax = mChildren.Count; i < imax; ++i)
+            {
+                Transform t = mChildren[i];
+                float distance = t.localPosition.y - center.y;
+                
+                if (distance > extents)
+                {
+                    Vector3 pos = t.localPosition;
+                    pos.y -= ext2;
+                    distance = pos.y - center.y;
+                    int realIndex = Mathf.RoundToInt(pos.y / itemSize);
+
+                    if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
+                    {
+                        t.localPosition = pos;
+                        UpdateItem(t, i);
+
+                        // Down Object
+                        uiTable[i] = t;
+                    }
+                    else allWithinRange = false;
+                }
+                else if (mFirstTime) UpdateItem(t, i);
+
+                if (cullContent)
+                {
+                    distance += mPanel.clipOffset.y - mTrans.localPosition.y;
+                    if (!UICamera.IsPressed(t.gameObject))
+                        NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
+                }
+            }
+
+            DownTable();
+
+            ClearUITable();
+            for (int i = mChildren.Count - 1; i >= 0; --i)
             {
                 Transform t = mChildren[i];
                 float distance = t.localPosition.y - center.y;
@@ -111,29 +152,11 @@ public class StageUIWarpContent : UIWrapContent
                         t.localPosition = pos;
                         UpdateItem(t, i);
 
-                        // Object Up
-                        UpUITransform(t, i + 1);
+                        // Up Object
+                        uiTable[i] = t;
                     }
                     else allWithinRange = false;
                 }
-                else if (distance > extents)
-                {
-                    Vector3 pos = t.localPosition;
-                    pos.y -= ext2;
-                    distance = pos.y - center.y;
-                    int realIndex = Mathf.RoundToInt(pos.y / itemSize);
-
-                    if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
-                    {
-                        t.localPosition = pos;
-                        UpdateItem(t, i);
-
-                        // Object Down
-                        DownUITransform(t, i - 1);
-                    }
-                    else allWithinRange = false;
-                }
-                else if (mFirstTime) UpdateItem(t, i);
 
                 if (cullContent)
                 {
@@ -142,16 +165,85 @@ public class StageUIWarpContent : UIWrapContent
                         NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
                 }
             }
+
+            UpTable();
         }
         //mScroll.restrictWithinPanel = !allWithinRange;
         mScroll.InvalidateBounds();
     }
 
-    void DownUITransform(Transform t, int prevIndex)
+    void ClearUITable()
     {
-        prevIndex = (prevIndex < 0) ? mChildren.Count - 1 : prevIndex;
+        for(int i = 0; i < uiTable.Length; i++)
+            uiTable[i] = null;
+    }
 
-        StageSelectLine line = mChildren[prevIndex].transform.GetComponent<StageSelectLine>();
+    void PushUITable(Transform t, int index)
+    {
+        uiTable[index] = t;
+    }
+
+    delegate void UITransform(Transform t, int index);
+
+    void DownTable()
+    {
+        for(int i = 0; i < uiTable.Length; i++)
+        {
+            if(uiTable[i])
+            {
+                RecursiveDownFuc(i);
+            }
+        }
+    }
+
+    void RecursiveDownFuc(int index)
+    {
+        int nextIndex = index - 1;
+        nextIndex = (nextIndex < 0) ? mChildren.Count - 1 : nextIndex;
+
+        if (uiTable[nextIndex])
+        {
+            RecursiveDownFuc(nextIndex);
+            DownUITransform(uiTable[index], nextIndex);
+        }
+        else
+        {
+            DownUITransform(uiTable[index], nextIndex);
+        }
+        uiTable[index] = null;
+    }
+
+    void UpTable()
+    {
+        for (int i = uiTable.Length - 1; i >= 0; --i)
+        {
+            if (uiTable[i])
+            {
+                RecursiveUpFuc(i);
+            }
+        }
+    }
+
+    void RecursiveUpFuc(int index)
+    {
+        int nextIndex = index + 1;
+        nextIndex = (nextIndex >= mChildren.Count) ? 0 : nextIndex;
+
+        if(uiTable[nextIndex])
+        {
+            RecursiveUpFuc(nextIndex);
+            UpUITransform(uiTable[index], nextIndex);
+        }
+        else 
+        {
+            UpUITransform(uiTable[index], nextIndex);
+        }
+        uiTable[index] = null;
+    }
+
+    void DownUITransform(Transform t, int nextIndex)
+    {
+        StageSelectLine line = mChildren[nextIndex].transform.GetComponent<StageSelectLine>();
 
         int stageNumber = line.GetStageMaxNumber();
 
@@ -160,14 +252,14 @@ public class StageUIWarpContent : UIWrapContent
         Debug.Log(stageNumber);
     }
 
-    void UpUITransform(Transform t, int prevIndex)
+    void UpUITransform(Transform t, int nextIndex)
     {
-        prevIndex = (prevIndex >= mChildren.Count) ? 0 : prevIndex;
-
-        StageSelectLine line = mChildren[prevIndex].transform.GetComponent<StageSelectLine>();
+        StageSelectLine line = mChildren[nextIndex].transform.GetComponent<StageSelectLine>();
 
         int stageNumber = line.GetStageMinNumber();
 
         t.GetComponent<StageSelectLine>().SetStageNumber(stageNumber - 5);
+
+        Debug.Log(stageNumber);
     }
 }

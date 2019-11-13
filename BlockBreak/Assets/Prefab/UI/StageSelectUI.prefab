@@ -191,8 +191,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemSize: 150
   cullContent: 1
-  minIndex: 0
-  maxIndex: 100
+  minIndex: -100
+  maxIndex: 0
   hideInactive: 0
 --- !u!1 &2808933184489605613
 GameObject:

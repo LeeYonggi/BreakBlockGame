@@ -34,12 +34,12 @@ public class StageSelectMaker : MonoBehaviour
         }
 
         //uiGrid.enabled = false;
+        //uiGrid.enabled = true;
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        //uiGrid.enabled = true;
 
         //wrapScript = gameObject.AddComponent<UIWrapContent>();
 
