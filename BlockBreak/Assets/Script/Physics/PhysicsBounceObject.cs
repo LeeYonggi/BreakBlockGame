@@ -131,7 +131,9 @@ public class PhysicsBounceObject : MonoBehaviour
     {
         // http://rapapa.net/?p=673 - 반사공식 사이트
         // V - 2 * N * (V dot N)    - 반사공식
-        return Vector2.Reflect(direction, normalVector);
+        float dot = Vector2.Dot(direction, normalVector);
+
+        return direction - 2 * normalVector * dot;
     }
 
     /// <summary>

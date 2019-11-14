@@ -5,7 +5,8 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Wrap Content")]
 public class StageUIWarpContent : UIWrapContent
 {
-    private Transform[] uiTable = null;
+    private List<StageSelectLine> mUIChildren = new List<StageSelectLine>();
+    private new LinkedList<StageSelectLine> mChildren = new LinkedList<StageSelectLine>();
 
     [ContextMenu("Sort Based on Scroll Movement")]
     public override void SortBasedOnScrollMovement()
@@ -14,20 +15,29 @@ public class StageUIWarpContent : UIWrapContent
 
         // Cache all children and place them in order
         mChildren.Clear();
-        
+
+        List<Transform> objList = new List<Transform>();
+
         for (int i = 0; i < mTrans.childCount; ++i)
         {
             Transform t = mTrans.GetChild(i);
             if (hideInactive && !t.gameObject.activeInHierarchy) continue;
-            mChildren.Add(t);
+            objList.Add(t);
         }
 
-        uiTable = new Transform[mTrans.childCount];
-
-        ResetChildPositions();
+        ResetChildPositions(objList);
         // Sort the list of children so that they are in order
-        if (mHorizontal) mChildren.Sort(UIGrid.SortHorizontal);
-        else mChildren.Sort(UIGrid.SortVertical);
+        if (mHorizontal) objList.Sort(UIGrid.SortHorizontal);
+        else objList.Sort(UIGrid.SortVertical);
+
+        for (int i = 0; i < objList.Count; i++)
+            mUIChildren.Add(objList[i].GetComponent<StageSelectLine>());
+
+        for (int i = 0; i < objList.Count; i++)
+            mChildren.AddLast(objList[i].GetComponent<StageSelectLine>());
+
+        if(DataManager.Instance.NowStage != 0)
+            MoveToStage(DataManager.Instance.NowStage);
     }
 
     public override void WrapContent()
@@ -46,220 +56,141 @@ public class StageUIWarpContent : UIWrapContent
         bool allWithinRange = true;
         float ext2 = extents * 2f;
 
-        if (mHorizontal)
+        float min = corners[0].y - itemSize;
+        float max = corners[2].y + itemSize;
+
+        // 링크드리스트를 이용하여 y값을 정렬하였다.
+        for (var node = mChildren.First; node != null;)
         {
-            float min = corners[0].x - itemSize;
-            float max = corners[2].x + itemSize;
+            bool isDown = false;
+            Transform t = node.Value.transform;
+            float distance = t.localPosition.y - center.y;
 
-            for (int i = 0, imax = mChildren.Count; i < imax; ++i)
+            if (distance > extents)
             {
-                Transform t = mChildren[i];
-                float distance = t.localPosition.x - center.x;
+                Vector3 pos = t.localPosition;
+                pos.y -= ext2;
+                distance = pos.y - center.y;
+                int realIndex = Mathf.RoundToInt(pos.y / itemSize);
 
-                if (distance < -extents)
+                if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
                 {
-                    Vector3 pos = t.localPosition;
-                    pos.x += ext2;
-                    distance = pos.x - center.x;
-                    int realIndex = Mathf.RoundToInt(pos.x / itemSize);
+                    t.localPosition = pos;
 
-                    if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
-                    {
-                        t.localPosition = pos;
-                        UpdateItem(t, i);
-                    }
-                    else allWithinRange = false;
+                    // Down Object
+                    isDown = true;
                 }
-                else if (distance > extents)
-                {
-                    Vector3 pos = t.localPosition;
-                    pos.x -= ext2;
-                    distance = pos.x - center.x;
-                    int realIndex = Mathf.RoundToInt(pos.x / itemSize);
-
-                    if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
-                    {
-                        t.localPosition = pos;
-                        UpdateItem(t, i);
-                    }
-                    else allWithinRange = false;
-                }
-                else if (mFirstTime) UpdateItem(t, i);
-
-                if (cullContent)
-                {
-                    distance += mPanel.clipOffset.x - mTrans.localPosition.x;
-                    if (!UICamera.IsPressed(t.gameObject))
-                        NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
-                }
+                else allWithinRange = false;
             }
-        }
-        else
-        {
-            float min = corners[0].y - itemSize;
-            float max = corners[2].y + itemSize;
 
-            ClearUITable();
-            for (int i = 0, imax = mChildren.Count; i < imax; ++i)
+            if (cullContent)
             {
-                Transform t = mChildren[i];
-                float distance = t.localPosition.y - center.y;
+                //distance += mPanel.clipOffset.y - mTrans.localPosition.y;
+                //if (!UICamera.IsPressed(t.gameObject))
+                //    NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
+            }
+            // 스테이지 번호 바꿈
+            if (isDown)
+            {
+                UIStageDown(node.Value, mChildren.Last.Value);
+
+                mChildren.AddLast(node.Value);
                 
-                if (distance > extents)
-                {
-                    Vector3 pos = t.localPosition;
-                    pos.y -= ext2;
-                    distance = pos.y - center.y;
-                    int realIndex = Mathf.RoundToInt(pos.y / itemSize);
-
-                    if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
-                    {
-                        t.localPosition = pos;
-                        UpdateItem(t, i);
-
-                        // Down Object
-                        uiTable[i] = t;
-                    }
-                    else allWithinRange = false;
-                }
-                else if (mFirstTime) UpdateItem(t, i);
-
-                if (cullContent)
-                {
-                    distance += mPanel.clipOffset.y - mTrans.localPosition.y;
-                    if (!UICamera.IsPressed(t.gameObject))
-                        NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
-                }
+                var nextNode = node.Next;
+                
+                mChildren.Remove(node);
+                node = nextNode;
             }
-
-            DownTable();
-
-            ClearUITable();
-            for (int i = mChildren.Count - 1; i >= 0; --i)
+            else
             {
-                Transform t = mChildren[i];
-                float distance = t.localPosition.y - center.y;
+                node = node.Next;
+            }
+        }
 
-                if (distance < -extents)
+        for (var node = mChildren.Last; node != null;)
+        {
+            bool isUp = false;
+            Transform t = node.Value.transform;
+            float distance = t.localPosition.y - center.y;
+
+            if (distance < -extents)
+            {
+                Vector3 pos = t.localPosition;
+                pos.y += ext2;
+                distance = pos.y - center.y;
+                int realIndex = Mathf.RoundToInt(pos.y / itemSize);
+
+                if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
                 {
-                    Vector3 pos = t.localPosition;
-                    pos.y += ext2;
-                    distance = pos.y - center.y;
-                    int realIndex = Mathf.RoundToInt(pos.y / itemSize);
+                    t.localPosition = pos;
 
-                    if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
-                    {
-                        t.localPosition = pos;
-                        UpdateItem(t, i);
-
-                        // Up Object
-                        uiTable[i] = t;
-                    }
-                    else allWithinRange = false;
+                    // Up Object
+                    isUp = true;
                 }
-
-                if (cullContent)
-                {
-                    distance += mPanel.clipOffset.y - mTrans.localPosition.y;
-                    if (!UICamera.IsPressed(t.gameObject))
-                        NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
-                }
+                else allWithinRange = false;
             }
 
-            UpTable();
+            if (cullContent)
+            {
+                //distance += mPanel.clipOffset.y - mTrans.localPosition.y;
+                //if (!UICamera.IsPressed(t.gameObject))
+                //    NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
+            }
+            // 스테이지 번호 바꿈
+            if(isUp)
+            {
+                UIStageUp(node.Value, mChildren.First.Value);
+
+                mChildren.AddFirst(node.Value);
+
+                var nextNode = node.Previous;
+
+                mChildren.Remove(node);
+                node = nextNode;
+            }
+            else
+            {
+                node = node.Previous;
+            }
         }
+
         //mScroll.restrictWithinPanel = !allWithinRange;
         mScroll.InvalidateBounds();
     }
 
-    void ClearUITable()
+    /// <summary>
+    /// 스크롤바가 해당 스테이지 포지션으로 이동
+    /// </summary>
+    /// <param name="stageNumber"></param>
+    public void MoveToStage(int stageNumber)
     {
-        for(int i = 0; i < uiTable.Length; i++)
-            uiTable[i] = null;
+        Vector3 targetPosition = mScroll.transform.localPosition;
+
+        Vector3[] corners = mPanel.worldCorners;
+
+        float scrollDistance = mScroll.GetComponent<UIPanel>().GetViewSize().y;
+        float maxPos = (maxIndex - minIndex + 1) * itemSize - scrollDistance;
+        targetPosition.y = ((stageNumber - 1) / 5) * itemSize;
+
+        if (maxPos < targetPosition.y)
+            targetPosition.y = maxPos;
+
+        mScroll.transform.localPosition = targetPosition;
     }
 
-    void PushUITable(Transform t, int index)
+
+    void UIStageDown(StageSelectLine node, StageSelectLine prev)
     {
-        uiTable[index] = t;
+        int stageNumber = prev.GetStageMaxNumber();
+
+        node.SetStageNumber(stageNumber + 1);
     }
 
-    delegate void UITransform(Transform t, int index);
-
-    void DownTable()
+    void UIStageUp(StageSelectLine node, StageSelectLine prev)
     {
-        for(int i = 0; i < uiTable.Length; i++)
-        {
-            if(uiTable[i])
-            {
-                RecursiveDownFuc(i);
-            }
-        }
+        int stageNumber = prev.GetStageMinNumber();
+
+        node.SetStageNumber(stageNumber - 5);
     }
 
-    void RecursiveDownFuc(int index)
-    {
-        int nextIndex = index - 1;
-        nextIndex = (nextIndex < 0) ? mChildren.Count - 1 : nextIndex;
-
-        if (uiTable[nextIndex])
-        {
-            RecursiveDownFuc(nextIndex);
-            DownUITransform(uiTable[index], nextIndex);
-        }
-        else
-        {
-            DownUITransform(uiTable[index], nextIndex);
-        }
-        uiTable[index] = null;
-    }
-
-    void UpTable()
-    {
-        for (int i = uiTable.Length - 1; i >= 0; --i)
-        {
-            if (uiTable[i])
-            {
-                RecursiveUpFuc(i);
-            }
-        }
-    }
-
-    void RecursiveUpFuc(int index)
-    {
-        int nextIndex = index + 1;
-        nextIndex = (nextIndex >= mChildren.Count) ? 0 : nextIndex;
-
-        if(uiTable[nextIndex])
-        {
-            RecursiveUpFuc(nextIndex);
-            UpUITransform(uiTable[index], nextIndex);
-        }
-        else 
-        {
-            UpUITransform(uiTable[index], nextIndex);
-        }
-        uiTable[index] = null;
-    }
-
-    void DownUITransform(Transform t, int nextIndex)
-    {
-        StageSelectLine line = mChildren[nextIndex].transform.GetComponent<StageSelectLine>();
-
-        int stageNumber = line.GetStageMaxNumber();
-
-        t.GetComponent<StageSelectLine>().SetStageNumber(stageNumber + 1);
-
-        Debug.Log(stageNumber);
-    }
-
-    void UpUITransform(Transform t, int nextIndex)
-    {
-        StageSelectLine line = mChildren[nextIndex].transform.GetComponent<StageSelectLine>();
-
-        int stageNumber = line.GetStageMinNumber();
-
-        t.GetComponent<StageSelectLine>().SetStageNumber(stageNumber - 5);
-
-        Debug.Log(stageNumber);
-    }
 }

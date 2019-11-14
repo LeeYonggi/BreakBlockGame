@@ -17,6 +17,7 @@ public struct MapData
     }
 
     public Point pos;
+    public Vector2 scale;
     public OBJECT_STATE objState;
     public BoxStatus status;
 }
@@ -29,10 +30,6 @@ public static class StageParser
 
     public static MapData[,] CreateStageGridFromFile(string path)
     {
-        StreamReader fs = new StreamReader(path);
-
-        string line = string.Empty;
-
         MapData[,] mapLayer = null;
 
         int layerCount = 0;
@@ -41,11 +38,17 @@ public static class StageParser
 
         int nowLineNumber = 0;
 
-        while ((line = fs.ReadLine()) != null)
+        string allStream = File.ReadAllText(path);
+
+        string[] lineArr = allStream.Split('\n');
+
+        for(int lineIndex = 0; lineIndex < lineArr.Length; lineIndex++)
         {
+            lineArr[lineIndex] = lineArr[lineIndex].Split('\r')[0];
+
             if(isDataParse)
             {
-                string[] dataLine = line.Split(',');
+                string[] dataLine = lineArr[lineIndex].Split(',');
 
                 if (layerCount == 1)
                 {
@@ -66,7 +69,7 @@ public static class StageParser
                 continue;
             }
 
-            if (line.Equals("[layer]"))
+            if (lineArr[lineIndex].Equals("[layer]"))
             {
                 if(mapLayer == null)
                     mapLayer = new MapData[mapSize.Y,mapSize.X];
@@ -77,25 +80,24 @@ public static class StageParser
                 continue;
             }
 
-            int indexResult = line.IndexOf('=');
+            int indexResult = lineArr[lineIndex].IndexOf('=');
 
             if (indexResult != -1)
             {
-                if (line[line.Length - 1] == '1')
+                string lineStr = lineArr[lineIndex];
+                if (lineStr[lineStr.Length - 1] == '1')
                     layerCount = 1;
 
-                if (line[line.Length - 1] == '2')
+                if (lineStr[lineStr.Length - 1] == '2')
                     layerCount = 2;
 
-                if (line.Substring(0, indexResult) == "data")
+                if (lineStr.Substring(0, indexResult) == "data")
                     isDataParse = true;
                 continue;
             }
 
             
         }
-
-        fs.Close();
 
         return mapLayer;
     }
@@ -107,6 +109,7 @@ public static class StageParser
         mapData.pos.X = position;
         mapData.pos.Y = nowLine;
         mapData.objState = IntToMapState(parseResult);
+        mapData.scale = IntToScale(parseResult);
 
         return mapData;
     }
@@ -117,10 +120,30 @@ public static class StageParser
         if (num == 1)
             return MapData.OBJECT_STATE.BOX;
         if (num == 2)
-            return MapData.OBJECT_STATE.BOX;
+            return MapData.OBJECT_STATE.TRIANGLE;
+        if (num == 3)
+            return MapData.OBJECT_STATE.TRIANGLE;
+        if (num == 4)
+            return MapData.OBJECT_STATE.TRIANGLE;
+        if (num == 5)
+            return MapData.OBJECT_STATE.TRIANGLE;
         if (num == 21)
             return MapData.OBJECT_STATE.ITEM;
 
         return MapData.OBJECT_STATE.NONE;
+    }
+
+    private static Vector2 IntToScale(int num)
+    {
+        if (num == 2)
+            return new Vector2(-1, 1);
+        if (num == 3)
+            return new Vector2(1, 1);
+        if (num == 4)
+            return new Vector2(1, -1);
+        if (num == 5)
+            return new Vector2(-1, -1);
+
+        return new Vector2(1, 1);
     }
 }

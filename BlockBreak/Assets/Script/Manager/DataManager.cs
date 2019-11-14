@@ -15,7 +15,7 @@ public class DataManager : MonoBehaviour
     {
         if (Instance == null)
             Instance = this;
-        else if (Instance == this)
+        else if (Instance)
             GameObject.Destroy(gameObject);
 
         DontDestroyOnLoad(gameObject);

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class Ball : MonoBehaviour
 {
@@ -10,8 +11,6 @@ public class Ball : MonoBehaviour
         BALL_MOVE,
         BALL_FOLLOW
     }
-    private Vector2 m_MoveVector = new Vector2(0, 0);       // 방향벡터
-
     private float m_MoveSpeed = 0.0f;                       // 이동속도
     
     private BALL_STATE ballState = BALL_STATE.BALL_STOP;    // 현재 공 상태
@@ -66,7 +65,7 @@ public class Ball : MonoBehaviour
             case BALL_STATE.BALL_FOLLOW:
                 bounceComponent.enabled = false;
 
-                FollowFirstBall();
+                //FollowFirstBall();
 
                 break;
             default:
@@ -136,16 +135,39 @@ public class Ball : MonoBehaviour
 
     private void CollisionFloor(GameObject collision)
     {
-        BallState = BALL_STATE.BALL_FOLLOW;
-
-        m_MoveVector = new Vector2(0, 0);
-
         if (BallManager.Instance.FirstBall == null)
         {
             BallManager.Instance.FirstBall = gameObject;
 
             BallState = BALL_STATE.BALL_STOP;
+
+            return;
         }
+
+        FollowBallInit();
+    }
+
+    public void FollowBallInit()
+    {
+        BallState = BALL_STATE.BALL_FOLLOW;
+
+        Vector2 firstBallPos = BallManager.Instance.FirstBallPosition;
+
+        if (BallManager.Instance.FirstBall)
+            firstBallPos = BallManager.Instance.FirstBall.transform.position;
+
+        transform.DOMove(firstBallPos, 0.7f).SetEase(Ease.InOutQuint);
+        //transform.DOMoveY(firstBallPos.y, 0.7f).SetEase(Ease.InSine);
+        //transform.DOMoveX(firstBallPos.x, 0.7f).SetEase(Ease.InSine);
+
+        StartCoroutine(FollowTimeCoroutine(0.7f));
+    }
+
+    IEnumerator FollowTimeCoroutine(float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        BallState = BALL_STATE.BALL_STOP;
     }
 
     /// <summary>
@@ -158,13 +180,10 @@ public class Ball : MonoBehaviour
         if (BallManager.Instance.FirstBall)
             firstBallPos = BallManager.Instance.FirstBall.transform.position;
 
-        transform.position = Vector2.Lerp(transform.position, firstBallPos, Time.deltaTime * 8);
-
-        if(Vector2.Distance(transform.position, firstBallPos) < 0.2f)
+        if (Vector2.Distance(transform.position, firstBallPos) < 0.2f)
         {
             transform.position = firstBallPos;
 
-            BallState = BALL_STATE.BALL_STOP;
         }
     }
 }

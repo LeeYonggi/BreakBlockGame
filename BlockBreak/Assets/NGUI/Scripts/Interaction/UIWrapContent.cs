@@ -110,7 +110,7 @@ public class UIWrapContent : MonoBehaviour
 		// Sort the list of children so that they are in order
 		if (mHorizontal) mChildren.Sort(UIGrid.SortHorizontal);
 		else mChildren.Sort(UIGrid.SortVertical);
-		ResetChildPositions();
+		ResetChildPositions(mChildren);
 	}
 
 	/// <summary>
@@ -133,7 +133,7 @@ public class UIWrapContent : MonoBehaviour
 
 		// Sort the list of children so that they are in order
 		mChildren.Sort(UIGrid.SortByName);
-		ResetChildPositions();
+		ResetChildPositions(mChildren);
 	}
 
 	/// <summary>
@@ -156,11 +156,11 @@ public class UIWrapContent : MonoBehaviour
 	/// Helper function that resets the position of all the children.
 	/// </summary>
 
-	protected virtual void ResetChildPositions ()
+	protected virtual void ResetChildPositions (List<Transform> objList)
 	{
-		for (int i = 0, imax = mChildren.Count; i < imax; ++i)
+		for (int i = 0, imax = objList.Count; i < imax; ++i)
 		{
-			Transform t = mChildren[i];
+			Transform t = objList[i];
 			t.localPosition = mHorizontal ? new Vector3(i * itemSize, 0f, 0f) : new Vector3(0f, -i * itemSize, 0f);
 			UpdateItem(t, i);
 		}

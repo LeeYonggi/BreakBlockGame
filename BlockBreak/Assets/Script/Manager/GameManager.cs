@@ -41,6 +41,8 @@ public class GameManager : MonoBehaviour
 
     private int nextAddBall = 0;
 
+    private bool isInvincibility = false;
+
     public enum GAME_STEP
     {
         IDLE,
@@ -53,7 +55,7 @@ public class GameManager : MonoBehaviour
     {
         if (Instance == null)
             Instance = this;
-        else if (Instance == this)
+        else if (Instance)
             GameObject.Destroy(gameObject);
     }
 
@@ -120,7 +122,7 @@ public class GameManager : MonoBehaviour
         //for (int i = 0; i < random; i++)
         //    CreateBox();
         
-        CreateItem();
+        //CreateItem();
     }
 
     void ChangePlay()
@@ -143,23 +145,32 @@ public class GameManager : MonoBehaviour
         nowBoxLine[data.pos.X] = box;
     }
 
-    void CreateItem()
+    public void CreateTriangle(MapData data)
     {
-        int random = Random.Range(1, MAX_LINEBOX);
+        GameObject box = null;
 
-        if (nowBoxLine[random] != null)
-        {
-            CreateItem();
-            return;
-        }
+        box = GameObject.Instantiate(triangleBoxPrefab, transform);
 
+        box.transform.localScale = data.scale; 
+
+        box.transform.position = new Vector2(data.pos.X * 0.6f - 2.4f, 3.3f - data.pos.Y * 0.6f);
+
+        boxPacks.Add(box);
+
+        box.GetComponent<Box>().BoxStatus = new BoxStatus(data.status.boxCount);
+
+        nowBoxLine[data.pos.X] = box;
+    }
+
+    public void CreateItem(MapData data)
+    {
         GameObject item = GameObject.Instantiate(levelUpItem);
 
-        item.transform.position = new Vector2(random * 0.6f - 2.4f, 3.3f);
+        item.transform.position = new Vector2(data.pos.X * 0.6f - 2.4f, 3.3f - data.pos.Y * 0.6f);
 
         itemPacks.Add(item);
 
-        nowBoxLine[random] = item;
+        nowBoxLine[data.pos.X] = item;
     }
 
     public void DestroyBox(GameObject box)
@@ -201,5 +212,13 @@ public class GameManager : MonoBehaviour
             return 1.0f;
         }
         return 1.0f;
+    }
+
+    public void OnInvincibleBox()
+    {
+        isInvincibility = !isInvincibility;
+
+        for (int i = 0; i < boxPacks.Count; i++)
+            boxPacks[i].GetComponent<Box>().IsInvincibility = isInvincibility;
     }
 }

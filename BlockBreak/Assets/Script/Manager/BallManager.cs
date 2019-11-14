@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 public class BallManager : MonoBehaviour
 {
@@ -55,19 +55,20 @@ public class BallManager : MonoBehaviour
     /// </summary>
     private readonly Vector2 firstBallPosition = new Vector2(0, -3.0f);
 
-    private GameObject firstBall = null;                 // 첫번째 공
-
-    [SerializeField]
+    private GameObject firstBall = null;                // 첫번째 공
+                                                        
+    [SerializeField]                                    
     private GameObject ballPrefab = null;               // 공 프리펩
-
-    [SerializeField]
+                                                        
+    [SerializeField]                                    
     private GameObject guidLinePrefab = null;           // 가이드 라인 프리펩
-
-    [SerializeField]
+                                                        
+    [SerializeField]                                    
     private int maxBallCount = 1;                       // 공의 개수
-
+                                                        
     private GuidLine guidLine = null;                   // 가이드 라인
 
+    private bool isAngleOption = false;                 // 각도를 직접 ui로 설정하였는가.
 
 
     #region Property
@@ -110,7 +111,7 @@ public class BallManager : MonoBehaviour
     {
         if (Instance == null)
             Instance = this;
-        else if (Instance == this)
+        else if (Instance)
             GameObject.Destroy(gameObject);
     }
 
@@ -118,14 +119,30 @@ public class BallManager : MonoBehaviour
     void Start()
     {
         // 처음 공 생성
-        for(int i = 0; i < maxBallCount; i++)
-            CreateBall();
-
-        FirstBall = ballPacks[0].gameObject;
+        ResetBall(maxBallCount);
 
         OnMouseUp += FireBallInitalize;
         OnMouseUp += DisableGuidLine;
         OnMouseUp += StepInitialize;
+        OnMouseUp += WriteAngleLog;
+    }
+
+    public void OnResetBallClick(Text text)
+    {
+        ResetBall(int.Parse(text.text));
+    }
+
+    private void ResetBall(int maxBall)
+    {
+        for (int i = 0; i < ballPacks.Count; i++)
+            Destroy(ballPacks[i].gameObject);
+
+        ballPacks.Clear();
+
+        for (int i = 0; i < maxBall; i++)
+            CreateBall();
+
+        FirstBall = ballPacks[0].gameObject;
     }
 
     // Update is called once per frame
@@ -150,6 +167,8 @@ public class BallManager : MonoBehaviour
     // 마우스 컨트롤
     public void MouseControll()
     {
+        if (isAngleOption) return;
+
         MobileTouch();
         PcTouch();
     }
@@ -263,22 +282,75 @@ public class BallManager : MonoBehaviour
         ActiveGuidLine(firstBall.transform.position);
     }
 
+    /// <summary>
+    /// 마우스를 손에서 때면 불러야 하는 함수
+    /// </summary>
+    /// <param name="keyState"></param>
     void MouseUp(out KEY_STATE keyState)
     {
         if (IsMousePressPossible())
         {
             OnMouseUp();
-
-            keyState = KEY_STATE.NONE;
-
-            firstPosition = new Vector2(0, 0);
         }
+        keyState = KEY_STATE.NONE;
+        firstPosition = new Vector2(0, 0);
+        secondPosition = new Vector2(0, 0);
+    }
+
+    /// <summary>
+    /// ui에서 발사 각도를 변경할 때 사용.
+    /// </summary>
+    /// <param name="text"></param>
+    public void TransformAngle(Text text)
+    {
+        float angle = float.Parse(text.text);
+
+        isAngleOption = true;
+
+        firstPosition = new Vector2(0, 0);
+
+        secondPosition.x = Mathf.Cos(angle * Mathf.Deg2Rad) * 10.0f;
+        secondPosition.y = Mathf.Sin(angle * Mathf.Deg2Rad) * 10.0f;
+
+        ActiveGuidLine(firstBall.transform.position);
+
+        m_KeyState = KEY_STATE.NONE;
+        m_PcKeyState = KEY_STATE.NONE;
+    }
+
+    /// <summary>
+    /// ui를 이용하여 발사하고 싶을 때 사용
+    /// </summary>
+    public void OnUIBallFire()
+    {
+        if (isAngleOption == false) return;
+
+        OnMouseUp();
+
+        firstPosition = new Vector2(0, 0);
+        secondPosition = new Vector2(0, 0);
+
+        isAngleOption = false;
+    }
+
+    /// <summary>
+    /// 발사되는 공 각도를 로그로 남겨준다.
+    /// </summary>
+    void WriteAngleLog()
+    {
+        Vector2 directionVec2 = secondPosition - firstPosition;
+
+        directionVec2.Normalize();
+
+        float angle = 0.0f;
+
+        if (directionVec2.y > 0)
+            angle = Mathf.Acos(Vector2.Dot(directionVec2, new Vector2(1, 0))) * Mathf.Rad2Deg;
         else
-        {
-            keyState = KEY_STATE.NONE;
+            angle = Mathf.Acos(Vector2.Dot(directionVec2, new Vector2(-1, 0))) * Mathf.Rad2Deg + 180;
 
-            firstPosition = new Vector2(0, 0);
-        }
+
+        Debug.Log(angle);
     }
 
     // 방향 백터를 구한 뒤, 공 발사 상태로 전환시켜주는 함수.
@@ -347,7 +419,7 @@ public class BallManager : MonoBehaviour
         FirstBall = FindStopBall();
 
         for (int i = 0; i < ballPacks.Count; i++)
-            ballPacks[i].BallState = Ball.BALL_STATE.BALL_FOLLOW;
+            ballPacks[i].FollowBallInit();
 
     }
 

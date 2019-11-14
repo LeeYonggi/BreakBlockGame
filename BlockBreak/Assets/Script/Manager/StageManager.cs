@@ -24,8 +24,7 @@ public class StageManager : MonoBehaviour
         {
             for(int x = 0; x < StageParser.MapSize.X; x++)
             {
-                if(mapData[y, x].objState != MapData.OBJECT_STATE.NONE)
-                    GameManager.Instance.CreateBox(mapData[y,x]);
+                CreateMapAccordingState(mapData[y, x]);
             }
         }
     }
@@ -34,5 +33,15 @@ public class StageManager : MonoBehaviour
     void Update()
     {
         
+    }
+
+    void CreateMapAccordingState(MapData mapData)
+    {
+        if (mapData.objState == MapData.OBJECT_STATE.BOX)
+            GameManager.Instance.CreateBox(mapData);
+        if(mapData.objState == MapData.OBJECT_STATE.TRIANGLE)
+            GameManager.Instance.CreateTriangle(mapData);
+        if (mapData.objState == MapData.OBJECT_STATE.ITEM)
+            GameManager.Instance.CreateItem(mapData);
     }
 }

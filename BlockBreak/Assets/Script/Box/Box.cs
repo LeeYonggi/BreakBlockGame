@@ -23,7 +23,10 @@ public class Box : MonoBehaviour
     [SerializeField]
     BoxStatus boxStatus = new BoxStatus(1);
 
+    private bool isInvincibility = false;
+
     public BoxStatus BoxStatus { get => boxStatus; set => boxStatus = value; }
+    public bool IsInvincibility { get => isInvincibility; set => isInvincibility = value; }
 
 
     // Start is called before the first frame update
@@ -60,6 +63,8 @@ public class Box : MonoBehaviour
 
    public void BoxHit()
     {
+        if (isInvincibility) return;
+
         boxStatus.boxCount -= 1;
         countText.text = boxStatus.boxCount.ToString();
 
