@@ -1804,6 +1804,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 485da6e264dbf994fbe6f7c5303ff3b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  screenRatioList:
+  - screenRatio: {x: 1440, y: 2960}
+    screenSize: 6
 --- !u!1 &552902752
 GameObject:
   m_ObjectHideFlags: 0
@@ -5403,7 +5406,12 @@ PrefabInstance:
     - target: {fileID: 1133734734220060193, guid: 15e7d2a7a41734046bae856420acc772,
         type: 3}
       propertyPath: shootDelay
-      value: 0.08
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 1133734734220060193, guid: 15e7d2a7a41734046bae856420acc772,
+        type: 3}
+      propertyPath: shootSpeed
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 1133734734220060192, guid: 15e7d2a7a41734046bae856420acc772,
         type: 3}
@@ -5528,6 +5536,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1676240143792471121, guid: 7c90f0a358e21fb41ad3f87b7bf9db70,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.19
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7c90f0a358e21fb41ad3f87b7bf9db70, type: 3}
@@ -5704,6 +5717,36 @@ PrefabInstance:
       value: OnClickExit
       objectReference: {fileID: 0}
     - target: {fileID: 9036685684643197283, guid: 26fa8076a62f4554fafecebbcc7e3399,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 1529575717830984182, guid: 26fa8076a62f4554fafecebbcc7e3399,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1529575717830984182, guid: 26fa8076a62f4554fafecebbcc7e3399,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1529575717830984182, guid: 26fa8076a62f4554fafecebbcc7e3399,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1529575717830984182, guid: 26fa8076a62f4554fafecebbcc7e3399,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 385689322}
+    - target: {fileID: 1529575717830984182, guid: 26fa8076a62f4554fafecebbcc7e3399,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnRePlayButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 1529575717830984182, guid: 26fa8076a62f4554fafecebbcc7e3399,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine

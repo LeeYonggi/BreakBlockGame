@@ -87,10 +87,10 @@ public class PhysicsBounceObject : MonoBehaviour
                     Vector2 currentNormal = hitBuffer[i].normal;
 
                     // 반사 처리
-                    velocity = ChangeDirection(velocity, hitBuffer[i].normal);
+                    velocity = ChangeDirection(velocity, currentNormal);
 
                     // distance 보정
-                    float modifiedDistance = hitBuffer[i].distance - shellRadius;
+                    float modifiedDistance = hitBuffer[i].distance + shellRadius;
                     distance = GetModifiedDistance(distance, modifiedDistance);
 
                     preBounceObject = hitBuffer[i].collider.gameObject;
@@ -129,11 +129,34 @@ public class PhysicsBounceObject : MonoBehaviour
     /// 닿은 타겟의 법선 벡터
     public static Vector2 ChangeDirection(Vector2 direction, Vector2 normalVector)
     {
+        if (ReflexException(direction, normalVector))
+            return direction;
+
         // http://rapapa.net/?p=673 - 반사공식 사이트
         // V - 2 * N * (V dot N)    - 반사공식
         float dot = Vector2.Dot(direction, normalVector);
 
         return direction - 2 * normalVector * dot;
+    }
+
+    /// <summary>
+    /// 반사가 되면 안되는 상황에서 반사가 되었을시 true 반환
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <param name="normalVector"></param>
+    /// <returns></returns>
+    static bool ReflexException(Vector2 direction, Vector2 normalVector)
+    {
+        if (direction.x < 0 && normalVector.x < 0)
+            return true;
+        if (direction.y < 0 && normalVector.y < 0)
+            return true;
+        if (direction.x > 0 && normalVector.x > 0)
+            return true;
+        if (direction.y > 0 && normalVector.y > 0)
+            return true;
+
+        return false;
     }
 
     /// <summary>

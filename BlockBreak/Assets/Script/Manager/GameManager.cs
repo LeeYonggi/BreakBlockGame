@@ -191,27 +191,38 @@ public class GameManager : MonoBehaviour
 
     public void GameSpeedUp()
     {
-        Time.timeScale = ChangeTimeState();
+        ChangeTimeState();
+        Time.timeScale = GetStateToTime();
     }
 
-    private float ChangeTimeState()
+    public float GetStateToTime()
     {
         if(timeState.Equals(TIME_STATE.ATTACH_NONE))
+            return 1.0f;
+        if (timeState.Equals(TIME_STATE.ATTACH_DOUBLE))
+            return 2.0f;
+        if (timeState.Equals(TIME_STATE.ATTACH_QUADRUPLE))
+            return 4.0f;
+        return 1.0f;
+    }
+
+    public void ChangeTimeState()
+    {
+        if (timeState.Equals(TIME_STATE.ATTACH_NONE))
         {
             timeState = TIME_STATE.ATTACH_DOUBLE;
-            return 2.0f;
+            return;
         }
         if (timeState.Equals(TIME_STATE.ATTACH_DOUBLE))
         {
             timeState = TIME_STATE.ATTACH_QUADRUPLE;
-            return 4.0f;
+            return;
         }
         if (timeState.Equals(TIME_STATE.ATTACH_QUADRUPLE))
         {
             timeState = TIME_STATE.ATTACH_NONE;
-            return 1.0f;
+            return;
         }
-        return 1.0f;
     }
 
     public void OnInvincibleBox()

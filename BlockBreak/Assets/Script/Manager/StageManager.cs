@@ -16,7 +16,7 @@ public class StageManager : MonoBehaviour
 
     private void CreateStageMap()
     {
-        string stagePath = Application.dataPath + $"/MapFile/map2/mapdata{DataManager.Instance.NowStage}.txt";
+        string stagePath = $"MapFile/map2/mapdata{DataManager.Instance.NowStage}";
 
         MapData[,] mapData = StageParser.CreateStageGridFromFile(stagePath);
 

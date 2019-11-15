@@ -39,7 +39,7 @@ public class StageSelectUI : MonoBehaviour
 
     public void OnClickUI()
     {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(1);
         DataManager.Instance.NowStage = int.Parse(label.text);
     }
 }

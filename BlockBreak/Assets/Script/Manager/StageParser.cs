@@ -38,8 +38,10 @@ public static class StageParser
 
         int nowLineNumber = 0;
 
-        string allStream = File.ReadAllText(path);
+        TextAsset txt = Resources.Load(path, typeof(TextAsset)) as TextAsset;
 
+        string allStream = txt.text;
+        
         string[] lineArr = allStream.Split('\n');
 
         for(int lineIndex = 0; lineIndex < lineArr.Length; lineIndex++)
