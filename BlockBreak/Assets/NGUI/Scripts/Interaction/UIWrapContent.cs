@@ -75,7 +75,7 @@ public class UIWrapContent : MonoBehaviour
 	protected virtual void Start ()
 	{
 		SortBasedOnScrollMovement();
-		WrapContent();
+		//WrapContent();
 		if (mScroll != null) mScroll.GetComponent<UIPanel>().onClipMove = OnMove;
 		mFirstTime = false;
 	}

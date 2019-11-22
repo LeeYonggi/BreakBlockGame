@@ -178,6 +178,10 @@ public class StageUIWarpContent : UIWrapContent
         mScroll.transform.localPosition = targetPosition;
     }
 
+    public void MoveToStageStr(string text)
+    {
+        MoveToStage(int.Parse(text));
+    }
 
     void UIStageDown(StageSelectLine node, StageSelectLine prev)
     {

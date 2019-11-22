@@ -10,17 +10,17 @@ public class GameManager : MonoBehaviour
     static public GameManager Instance { get => instance; set => instance = value; }
     public GAME_STEP GameStep { get => gameStep; set => gameStep = value; }
     public TIME_STATE TimeState { get => timeState; set => timeState = value; }
-    #endregion 
+    #endregion
 
     [SerializeField]
-    private GameObject boxPrefab = null;        // 박스 프리펩
+    private GameObject boxPrefab = null;            // 박스 프리펩
     [SerializeField]
-    private GameObject triangleBoxPrefab = null;// 삼각형 박스 프리펩
+    private GameObject triangleBoxPrefab = null;    // 삼각형 박스 프리펩
     [SerializeField]
-    private GameObject levelUpItem = null;      // 레벨업 아이템
+    private GameObject levelUpItem = null;          // 레벨업 아이템
 
     [SerializeField]
-    int nowCount = 20;                          // 박스 hp
+    int nowCount = 20;                              // 박스 hp
 
     public enum TIME_STATE
     {
@@ -130,43 +130,45 @@ public class GameManager : MonoBehaviour
         GameStep = GAME_STEP.PLAY;
     }
 
-    public void CreateBox(MapData data)
+    public void CreateBox(BoxStatus data)
     {
         GameObject box = null;
 
         box = GameObject.Instantiate(boxPrefab, transform);
 
-        box.transform.position = new Vector2(data.pos.X * 0.6f - 2.4f, 3.3f - data.pos.Y * 0.6f);
+        box.transform.position = new Vector2(data.pos.X * 0.6f - 2.4f, data.pos.Y * 0.6f - 0.3f);
 
         boxPacks.Add(box);
 
-        box.GetComponent<Box>().BoxStatus = new BoxStatus(data.status.boxCount);
+        box.GetComponent<Box>().BoxStatus = data;
 
         nowBoxLine[data.pos.X] = box;
     }
 
-    public void CreateTriangle(MapData data)
+    public void CreateTriangle(BoxStatus data)
     {
         GameObject box = null;
 
         box = GameObject.Instantiate(triangleBoxPrefab, transform);
 
-        box.transform.localScale = data.scale; 
+        box.transform.localScale = data.scale;
 
-        box.transform.position = new Vector2(data.pos.X * 0.6f - 2.4f, 3.3f - data.pos.Y * 0.6f);
+        box.transform.localRotation = Quaternion.Euler(0, 0, data.rotation);
+
+        box.transform.position = new Vector2(data.pos.X * 0.6f - 2.4f, data.pos.Y * 0.6f - 0.3f);
 
         boxPacks.Add(box);
 
-        box.GetComponent<Box>().BoxStatus = new BoxStatus(data.status.boxCount);
+        box.GetComponent<Box>().BoxStatus = data;
 
         nowBoxLine[data.pos.X] = box;
     }
 
-    public void CreateItem(MapData data)
+    public void CreateItem(BoxStatus data)
     {
         GameObject item = GameObject.Instantiate(levelUpItem);
 
-        item.transform.position = new Vector2(data.pos.X * 0.6f - 2.4f, 3.3f - data.pos.Y * 0.6f);
+        item.transform.position = new Vector2(data.pos.X * 0.6f - 2.4f, data.pos.Y * 0.6f - 0.3f);
 
         itemPacks.Add(item);
 
@@ -191,38 +193,32 @@ public class GameManager : MonoBehaviour
 
     public void GameSpeedUp()
     {
-        ChangeTimeState();
-        Time.timeScale = GetStateToTime();
+        timeState = ChangeTimeState(timeState);
+        Time.timeScale = GetStateToTime(timeState);
     }
 
-    public float GetStateToTime()
+    public float GetStateToTime(TIME_STATE state)
     {
-        if(timeState.Equals(TIME_STATE.ATTACH_NONE))
+        if (state.Equals(TIME_STATE.ATTACH_NONE))
             return 1.0f;
-        if (timeState.Equals(TIME_STATE.ATTACH_DOUBLE))
+        else if (state.Equals(TIME_STATE.ATTACH_DOUBLE))
             return 2.0f;
-        if (timeState.Equals(TIME_STATE.ATTACH_QUADRUPLE))
+        else if (state.Equals(TIME_STATE.ATTACH_QUADRUPLE))
             return 4.0f;
-        return 1.0f;
+        else
+            return 1.0f;
     }
 
-    public void ChangeTimeState()
+    public TIME_STATE ChangeTimeState(TIME_STATE state)
     {
-        if (timeState.Equals(TIME_STATE.ATTACH_NONE))
-        {
-            timeState = TIME_STATE.ATTACH_DOUBLE;
-            return;
-        }
-        if (timeState.Equals(TIME_STATE.ATTACH_DOUBLE))
-        {
-            timeState = TIME_STATE.ATTACH_QUADRUPLE;
-            return;
-        }
-        if (timeState.Equals(TIME_STATE.ATTACH_QUADRUPLE))
-        {
-            timeState = TIME_STATE.ATTACH_NONE;
-            return;
-        }
+        if (state.Equals(TIME_STATE.ATTACH_NONE))
+            return TIME_STATE.ATTACH_DOUBLE;
+        else if (state.Equals(TIME_STATE.ATTACH_DOUBLE))
+            return TIME_STATE.ATTACH_QUADRUPLE;
+        else if (state.Equals(TIME_STATE.ATTACH_QUADRUPLE))
+            return TIME_STATE.ATTACH_NONE;
+        else
+            return TIME_STATE.ATTACH_NONE;
     }
 
     public void OnInvincibleBox()

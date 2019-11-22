@@ -14,40 +14,35 @@ public class CameraController : MonoBehaviour
 {
     private Vector3 startPosition = new Vector3(0, 0, 0);
 
+    private Camera mCamera = null;
+
     [SerializeField]
-    private List<ScreenRatioData> screenRatioList;
+    private Vector2 pivotScreen = new Vector2(720, 1280);
 
-    private Dictionary<Vector2, float> screenRatioSize = new Dictionary<Vector2, float>();
 
-    private Camera mCamera = null; 
-
-    void DictionaryInit()
+    private void Awake()
     {
-        for(int i = 0; i < screenRatioList.Count; i++)
-            screenRatioSize.Add(screenRatioList[i].screenRatio, screenRatioList[i].screenSize);
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        DictionaryInit();
-
         mCamera = GetComponent<Camera>();
 
         startPosition = transform.position;
 
-        Vector2 screenRatio = new Vector2(Screen.width, Screen.height);
+        float pivotRatio = pivotScreen.y / pivotScreen.x;
+        float screenRatio = Screen.height / Screen.width;
 
-        //float size = screenRatioSize[screenRatio];
+        float tempRatio = screenRatio - pivotRatio;
 
-        if (screenRatioSize.TryGetValue(screenRatio, out float value))
-            mCamera.orthographicSize = screenRatioSize[screenRatio];
-    }
+        if(tempRatio > 0.0f)
+            mCamera.orthographicSize = (1.0f + tempRatio) * mCamera.orthographicSize;
+    }                                                               
 
     // Update is called once per frame
     void Update()
     {
-        
     }
 
     public void CameraShake(float scale, float endTime)

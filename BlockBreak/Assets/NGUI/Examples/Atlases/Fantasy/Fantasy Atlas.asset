@@ -15,8 +15,8 @@ MonoBehaviour:
   material: {fileID: 2100000, guid: e7ef61ebb5c25394c8706a7ea658349f, type: 2}
   mSprites:
   - name: Beveled Outline
-    x: 215
-    y: 323
+    x: 0
+    y: 24
     width: 17
     height: 17
     borderLeft: 5
@@ -28,8 +28,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Bright
-    x: 198
-    y: 323
+    x: 0
+    y: 6
     width: 17
     height: 17
     borderLeft: 5
@@ -41,8 +41,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Dark
-    x: 234
-    y: 323
+    x: 18
+    y: 24
     width: 17
     height: 17
     borderLeft: 5
@@ -55,7 +55,7 @@ MonoBehaviour:
     paddingBottom: 0
   - name: Fantasy Font
     x: 0
-    y: 0
+    y: 42
     width: 256
     height: 212
     borderLeft: 0
@@ -67,8 +67,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 44
   - name: Flat Outline
-    x: 181
-    y: 323
+    x: 18
+    y: 6
     width: 17
     height: 17
     borderLeft: 5
@@ -79,9 +79,22 @@ MonoBehaviour:
     paddingRight: 0
     paddingTop: 0
     paddingBottom: 0
+  - name: GameStart
+    x: 258
+    y: 392
+    width: 152
+    height: 120
+    borderLeft: 0
+    borderRight: 0
+    borderTop: 0
+    borderBottom: 0
+    paddingLeft: 24
+    paddingRight: 24
+    paddingTop: 40
+    paddingBottom: 40
   - name: Glow
-    x: 217
-    y: 189
+    x: 36
+    y: 8
     width: 17
     height: 15
     borderLeft: 4
@@ -93,8 +106,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: NGUI
-    x: 256
-    y: 178
+    x: 257
+    y: 8
     width: 255
     height: 76
     borderLeft: 0
@@ -106,8 +119,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Orc Armor - Boots
-    x: 256
-    y: 0
+    x: 511
+    y: 384
     width: 96
     height: 128
     borderLeft: 0
@@ -119,8 +132,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Orc Armor - Bracers
-    x: 130
-    y: 208
+    x: 387
+    y: 278
     width: 123
     height: 113
     borderLeft: 0
@@ -132,8 +145,8 @@ MonoBehaviour:
     paddingTop: 7
     paddingBottom: 8
   - name: Orc Armor - Shoulders
-    x: 0
-    y: 212
+    x: 258
+    y: 263
     width: 128
     height: 128
     borderLeft: 0
@@ -145,7 +158,7 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Paper Background
-    x: 255
+    x: 0
     y: 255
     width: 257
     height: 257
@@ -158,8 +171,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Smooth
-    x: 236
-    y: 189
+    x: 36
+    y: 24
     width: 17
     height: 17
     borderLeft: 4
@@ -171,8 +184,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Window
-    x: 0
-    y: 342
+    x: 257
+    y: 85
     width: 254
     height: 169
     borderLeft: 8

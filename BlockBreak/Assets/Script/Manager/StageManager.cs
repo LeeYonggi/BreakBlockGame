@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class StageManager : MonoBehaviour
@@ -11,14 +12,19 @@ public class StageManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        CreateStageMap();
+        if (DataManager.Instance.IsMapToolDirect)
+            CreateMapToolStage();
+        else
+            CreateStageMap();
+
+        DataManager.Instance.IsMapToolDirect = false;
     }
 
     private void CreateStageMap()
     {
-        string stagePath = $"MapFile/map2/mapdata{DataManager.Instance.NowStage}";
+        string stagePath = DataManager.Instance.ResourceMapPath;
 
-        MapData[,] mapData = StageParser.CreateStageGridFromFile(stagePath);
+        BoxStatus[,] mapData = StageParser.CreateStageGridFromFile(stagePath);
 
         for(int y = 0; y < StageParser.MapSize.Y; y++)
         {
@@ -29,19 +35,34 @@ public class StageManager : MonoBehaviour
         }
     }
 
+    private void CreateMapToolStage()
+    {
+        FileInfo fileInfo = DataManager.Instance.StageFileInfo;
+
+        List<BoxStatus[]> mapData = StageParser.CreateTestStageFromFile(fileInfo);
+
+        for (int y = 0; y < mapData.Count; y++)
+        {
+            for (int x = 0; x < mapData[y].Length; x++)
+            {
+                CreateMapAccordingState(mapData[y][x]);
+            }
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
         
     }
 
-    void CreateMapAccordingState(MapData mapData)
+    void CreateMapAccordingState(BoxStatus mapData)
     {
-        if (mapData.objState == MapData.OBJECT_STATE.BOX)
+        if (mapData.objState == BoxStatus.OBJECT_STATE.BOX)
             GameManager.Instance.CreateBox(mapData);
-        if(mapData.objState == MapData.OBJECT_STATE.TRIANGLE)
+        if(mapData.objState == BoxStatus.OBJECT_STATE.TRIANGLE)
             GameManager.Instance.CreateTriangle(mapData);
-        if (mapData.objState == MapData.OBJECT_STATE.ITEM)
+        if (mapData.objState == BoxStatus.OBJECT_STATE.ITEM)
             GameManager.Instance.CreateItem(mapData);
     }
 }

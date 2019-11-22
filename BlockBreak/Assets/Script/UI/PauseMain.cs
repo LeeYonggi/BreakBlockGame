@@ -9,7 +9,9 @@ public class PauseMain : MonoBehaviour
 
     public GameObject resume = null;
     public GameObject restart = null;
-    public GameObject exit = null;
+    private GameObject exit = null;
+
+    public GameObject Exit { get => exit; set => exit = value; }
 
     // Start is called before the first frame update
     void Start()
@@ -26,28 +28,34 @@ public class PauseMain : MonoBehaviour
     public void OnClickPause()
     { 
         gameObject.SetActive(true);
-        
+
+        Vector3 nowScale = transform.localScale;
+
         transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
 
-        transform.DOScale(new Vector3(2, 2, 2), 0.5f).SetEase(Ease.OutBack).SetUpdate(true);
+        transform.DOScale(nowScale, 0.5f).SetEase(Ease.OutBack).SetUpdate(true);
 
         Time.timeScale = 0.0f;
     }
 
     public void OnClickResume()
     {
-        transform.DOScale(new Vector3(0.1f, 0.1f, 0.1f), 0.5f).SetEase(Ease.InBack);
+        Vector3 nowScale = transform.localScale;
+
+        transform.DOScale(new Vector3(0.1f, 0.1f, 0.1f), 0.5f).SetEase(Ease.InBack).OnComplete( 
+            () => transform.localScale = nowScale
+            ); 
 
         StartCoroutine(ActiveOffCoroutine(0.5f));
 
-        Time.timeScale = GameManager.Instance.GetStateToTime();
+        Time.timeScale = GameManager.Instance.GetStateToTime(GameManager.Instance.TimeState);
     }
     
     public void OnClickExit()
     {
         gameObject.SetActive(false);
 
-        Time.timeScale = GameManager.Instance.GetStateToTime();
+        Time.timeScale = GameManager.Instance.GetStateToTime(GameManager.Instance.TimeState);
 
         SceneManager.LoadScene(0);
     }
@@ -56,7 +64,7 @@ public class PauseMain : MonoBehaviour
     {
         gameObject.SetActive(false);
 
-        Time.timeScale = GameManager.Instance.GetStateToTime();
+        Time.timeScale = GameManager.Instance.GetStateToTime(GameManager.Instance.TimeState);
 
         SceneManager.LoadScene(1);
     }

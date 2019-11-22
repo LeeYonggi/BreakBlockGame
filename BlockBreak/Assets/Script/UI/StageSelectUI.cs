@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -40,6 +41,7 @@ public class StageSelectUI : MonoBehaviour
     public void OnClickUI()
     {
         SceneManager.LoadScene(1);
+        DataManager.Instance.ResourceMapPath = $"MapFile/map2/mapdata{label.text}";
         DataManager.Instance.NowStage = int.Parse(label.text);
     }
 }

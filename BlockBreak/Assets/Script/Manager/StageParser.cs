@@ -6,21 +6,6 @@ using System.IO;
 using System.Drawing;
 using System;
 
-public struct MapData
-{
-    public enum OBJECT_STATE
-    {
-        NONE,
-        BOX,
-        TRIANGLE,
-        ITEM
-    }
-
-    public Point pos;
-    public Vector2 scale;
-    public OBJECT_STATE objState;
-    public BoxStatus status;
-}
 
 public static class StageParser
 {
@@ -28,9 +13,9 @@ public static class StageParser
 
     public static Point MapSize => mapSize;
 
-    public static MapData[,] CreateStageGridFromFile(string path)
+    public static BoxStatus[,] CreateStageGridFromFile(string path)
     {
-        MapData[,] mapLayer = null;
+        BoxStatus[,] mapLayer = null;
 
         int layerCount = 0;
 
@@ -60,7 +45,7 @@ public static class StageParser
                 if (layerCount == 2)
                 {
                     for (int i = 0; i < mapSize.X; i++)
-                        mapLayer[nowLineNumber, i].status.boxCount = int.Parse(dataLine[i]);
+                        mapLayer[nowLineNumber, i].boxCount = int.Parse(dataLine[i]);
                 }
 
                 nowLineNumber += 1;
@@ -74,7 +59,7 @@ public static class StageParser
             if (lineArr[lineIndex].Equals("[layer]"))
             {
                 if(mapLayer == null)
-                    mapLayer = new MapData[mapSize.Y,mapSize.X];
+                    mapLayer = new BoxStatus[mapSize.Y,mapSize.X];
 
                 isDataParse = false;
                 nowLineNumber = 0;
@@ -104,9 +89,48 @@ public static class StageParser
         return mapLayer;
     }
 
-    private static MapData CreateMapData(int nowLine, int position, int parseResult)
+    public static List<BoxStatus[]> CreateTestStageFromFile(FileInfo fileInfo)
     {
-        MapData mapData = new MapData();
+        if (fileInfo == null) return null;
+        if (fileInfo.FullName.Length == 0) return null;
+
+        string fullString = FTPParse.GetFTPTextFile(fileInfo.Name);
+
+        string[] lines = fullString.Split('\n');
+
+        List<BoxStatus[]> boxes = new List<BoxStatus[]>();
+
+        int listCount = int.Parse(lines[0].Split('\t')[1]);
+
+        Array.Reverse(lines);
+
+        for(int i = 0; i < listCount; i++)
+        {
+            boxes.Add(new BoxStatus[9]);
+
+            string[] lineStr = lines[i + 1].Split(' ');
+
+            for(int iNodeData = 0; iNodeData < lineStr.Length - 1; iNodeData++)
+            {
+                if (lineStr[iNodeData].Equals("-1"))
+                    continue;
+
+                string[] nodeData = lineStr[iNodeData].Split('/');
+
+                boxes[i][iNodeData].boxCount = int.Parse(nodeData[1]);
+                boxes[i][iNodeData].objState = IntToTestState(int.Parse(nodeData[0]));
+                boxes[i][iNodeData].rotation = int.Parse(nodeData[2]);
+                boxes[i][iNodeData].pos = new Point(iNodeData, i);
+                boxes[i][iNodeData].scale = new Vector2(1, 1);
+            }
+        }
+
+        return boxes;
+    }
+
+    private static BoxStatus CreateMapData(int nowLine, int position, int parseResult)
+    {
+        BoxStatus mapData = new BoxStatus();
 
         mapData.pos.X = position;
         mapData.pos.Y = nowLine;
@@ -117,22 +141,22 @@ public static class StageParser
     }
 
 
-    private static MapData.OBJECT_STATE IntToMapState(int num)
+    private static BoxStatus.OBJECT_STATE IntToMapState(int num)
     {
         if (num == 1)
-            return MapData.OBJECT_STATE.BOX;
+            return BoxStatus.OBJECT_STATE.BOX;
         if (num == 2)
-            return MapData.OBJECT_STATE.TRIANGLE;
+            return BoxStatus.OBJECT_STATE.TRIANGLE;
         if (num == 3)
-            return MapData.OBJECT_STATE.TRIANGLE;
+            return BoxStatus.OBJECT_STATE.TRIANGLE;
         if (num == 4)
-            return MapData.OBJECT_STATE.TRIANGLE;
+            return BoxStatus.OBJECT_STATE.TRIANGLE;
         if (num == 5)
-            return MapData.OBJECT_STATE.TRIANGLE;
+            return BoxStatus.OBJECT_STATE.TRIANGLE;
         if (num == 21)
-            return MapData.OBJECT_STATE.ITEM;
+            return BoxStatus.OBJECT_STATE.ITEM;
 
-        return MapData.OBJECT_STATE.NONE;
+        return BoxStatus.OBJECT_STATE.NONE;
     }
 
     private static Vector2 IntToScale(int num)
@@ -148,4 +172,17 @@ public static class StageParser
 
         return new Vector2(1, 1);
     }
+
+    private static BoxStatus.OBJECT_STATE IntToTestState(int num)
+    {
+        if (num == 1)
+            return BoxStatus.OBJECT_STATE.BOX;
+        if (num == 2)
+            return BoxStatus.OBJECT_STATE.TRIANGLE;
+        if (num == 3)
+            return BoxStatus.OBJECT_STATE.ITEM;
+
+        return BoxStatus.OBJECT_STATE.NONE;
+    }
+
 }

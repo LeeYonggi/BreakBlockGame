@@ -113,6 +113,7 @@ public class BallManager : MonoBehaviour
             Instance = this;
         else if (Instance)
             GameObject.Destroy(gameObject);
+
     }
 
     // Start is called before the first frame update
@@ -127,9 +128,9 @@ public class BallManager : MonoBehaviour
         OnMouseUp += WriteAngleLog;
     }
 
-    public void OnResetBallClick(Text text)
+    public void OnResetBallClick(string text)
     {
-        ResetBall(int.Parse(text.text));
+        ResetBall(int.Parse(text));
     }
 
     private void ResetBall(int maxBall)
@@ -256,10 +257,14 @@ public class BallManager : MonoBehaviour
 
     void MouseDown()
     {
-        firstPosition = GetTouchPoint();
+        if (firstBall)
+            firstPosition = firstBall.transform.position;
+        else
+            firstPosition = firstBallPosition;
+
         secondPosition = GetTouchPoint();
     }
-
+    
     void MousePress()
     {
         secondPosition = GetTouchPoint();
@@ -301,9 +306,9 @@ public class BallManager : MonoBehaviour
     /// ui에서 발사 각도를 변경할 때 사용.
     /// </summary>
     /// <param name="text"></param>
-    public void TransformAngle(Text text)
+    public void TransformAngle(string text)
     {
-        float angle = float.Parse(text.text);
+        float angle = float.Parse(text);
 
         isAngleOption = true;
 
