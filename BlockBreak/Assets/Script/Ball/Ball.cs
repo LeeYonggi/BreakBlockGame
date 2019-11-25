@@ -41,11 +41,7 @@ public class Ball : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-    }
-
-    private void FixedUpdate()
+    public void FixedUpdateMe()
     {
         switch (BallState)
         {
@@ -54,7 +50,7 @@ public class Ball : MonoBehaviour
 
                 break;
             case BALL_STATE.BALL_MOVE:
-                bounceComponent.enabled = true;
+                bounceComponent.FixedUpdateMe();
 
                 #region 무한 반복 방지 |현재 사용하지 않음|
                 //if (rb2D.velocity.y <= 0.07f && rb2D.velocity.y >= -0.07f)
@@ -128,7 +124,7 @@ public class Ball : MonoBehaviour
 
         if (collision.gameObject.tag.Equals("Item"))
         {
-            GameManager.Instance.AddBallCount();
+            InGameManager.Instance.AddBallCount();
             Destroy(collision.gameObject);
         }
     }

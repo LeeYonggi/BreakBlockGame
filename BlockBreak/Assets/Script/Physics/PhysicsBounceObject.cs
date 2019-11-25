@@ -44,13 +44,7 @@ public class PhysicsBounceObject : MonoBehaviour
         contactFilter.useLayerMask = true;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    private void FixedUpdate()
+    public void FixedUpdateMe()
     {
         Vector2 deltaPosition = velocity * Time.deltaTime;
 

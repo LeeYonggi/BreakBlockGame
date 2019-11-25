@@ -25,6 +25,6 @@ public class LevelUpItem : MonoBehaviour
 
     private void OnDestroy()
     {
-        GameManager.Instance.DestroyItem(gameObject);
+        InGameManager.Instance.DestroyItem(gameObject);
     }
 }

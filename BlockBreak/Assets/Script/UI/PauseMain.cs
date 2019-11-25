@@ -48,25 +48,25 @@ public class PauseMain : MonoBehaviour
 
         StartCoroutine(ActiveOffCoroutine(0.5f));
 
-        Time.timeScale = GameManager.Instance.GetStateToTime(GameManager.Instance.TimeState);
+        Time.timeScale = InGameManager.Instance.GetStateToTime(InGameManager.Instance.TimeState);
     }
     
     public void OnClickExit()
     {
         gameObject.SetActive(false);
 
-        Time.timeScale = GameManager.Instance.GetStateToTime(GameManager.Instance.TimeState);
+        Time.timeScale = InGameManager.Instance.GetStateToTime(InGameManager.Instance.TimeState);
 
-        SceneManager.LoadScene(0);
+        Manager.SceneManager.Instance.ChangeScene(0);
     }
 
     public void OnRePlayButton()
     {
         gameObject.SetActive(false);
 
-        Time.timeScale = GameManager.Instance.GetStateToTime(GameManager.Instance.TimeState);
+        Time.timeScale = InGameManager.Instance.GetStateToTime(InGameManager.Instance.TimeState);
 
-        SceneManager.LoadScene(1);
+        Manager.SceneManager.Instance.ChangeScene(1);
     }
 
     IEnumerator ActiveOffCoroutine(float time)

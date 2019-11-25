@@ -36,8 +36,8 @@ public class StageUIWarpContent : UIWrapContent
         for (int i = 0; i < objList.Count; i++)
             mChildren.AddLast(objList[i].GetComponent<StageSelectLine>());
 
-        if(DataManager.Instance.NowStage != 0)
-            MoveToStage(DataManager.Instance.NowStage);
+        if(MainManager.Instance.StageInfo.nowStage != 0)
+            MoveToStage(MainManager.Instance.StageInfo.nowStage);
     }
 
     public override void WrapContent()

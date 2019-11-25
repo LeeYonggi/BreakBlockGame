@@ -25,6 +25,6 @@ public class MoveScene : MonoBehaviour
 
     public void MoveToScene()
     {
-        SceneManager.LoadScene(nextScene);
+        Manager.SceneManager.Instance.ChangeScene(nextScene);
     }
 }

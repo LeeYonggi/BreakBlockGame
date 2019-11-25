@@ -1,23 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Manager;
 
-public class GameManager : MonoBehaviour
+public class InGameManager : Singleton<InGameManager>, BaseManager
 {
-    static private GameManager instance = null;
-
     #region Property
-    static public GameManager Instance { get => instance; set => instance = value; }
     public GAME_STEP GameStep { get => gameStep; set => gameStep = value; }
     public TIME_STATE TimeState { get => timeState; set => timeState = value; }
     #endregion
 
-    [SerializeField]
     private GameObject boxPrefab = null;            // 박스 프리펩
-    [SerializeField]
     private GameObject triangleBoxPrefab = null;    // 삼각형 박스 프리펩
-    [SerializeField]
     private GameObject levelUpItem = null;          // 레벨업 아이템
+
+    private GameObject transformParent = null;
 
     [SerializeField]
     int nowCount = 20;                              // 박스 hp
@@ -51,18 +48,21 @@ public class GameManager : MonoBehaviour
 
     private GAME_STEP gameStep = GAME_STEP.IDLE;
 
-    private void Awake()
+    private void ResourcesLoad()
     {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance)
-            GameObject.Destroy(gameObject);
+        boxPrefab = Resources.Load("Prefab/Box/Box") as GameObject;
+
+        triangleBoxPrefab = Resources.Load("Prefab/Box/TriangleBox") as GameObject;
+
+        levelUpItem = Resources.Load("Prefab/Item/LevelUpItem") as GameObject;
+
+        transformParent = new GameObject("BoxAndItemPack");
     }
 
-
-    // Start is called before the first frame update
-    void Start()
+    public void Awake()
     {
+        ResourcesLoad();
+
         GameObject[] objectBuffer = GameObject.FindGameObjectsWithTag("Box");
 
         for (int i = 0; i < objectBuffer.Length; i++)
@@ -73,8 +73,13 @@ public class GameManager : MonoBehaviour
         BallManager.Instance.OnMouseUp += ChangePlay;
     }
 
+    public void Start()
+    {
+    
+    }
+
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
         switch (GameStep)
         {
@@ -134,7 +139,7 @@ public class GameManager : MonoBehaviour
     {
         GameObject box = null;
 
-        box = GameObject.Instantiate(boxPrefab, transform);
+        box = GameObject.Instantiate(boxPrefab, transformParent.transform);
 
         box.transform.position = new Vector2(data.pos.X * 0.6f - 2.4f, data.pos.Y * 0.6f - 0.3f);
 
@@ -149,7 +154,7 @@ public class GameManager : MonoBehaviour
     {
         GameObject box = null;
 
-        box = GameObject.Instantiate(triangleBoxPrefab, transform);
+        box = GameObject.Instantiate(triangleBoxPrefab, transformParent.transform);
 
         box.transform.localScale = data.scale;
 
@@ -164,6 +169,10 @@ public class GameManager : MonoBehaviour
         nowBoxLine[data.pos.X] = box;
     }
 
+    /// <summary>
+    /// 아이템 생성
+    /// </summary>
+    /// <param name="data"></param>
     public void CreateItem(BoxStatus data)
     {
         GameObject item = GameObject.Instantiate(levelUpItem);
@@ -178,7 +187,7 @@ public class GameManager : MonoBehaviour
     public void DestroyBox(GameObject box)
     {
         boxPacks.Remove(box);
-        Destroy(box);
+        GameObject.Destroy(box);
     }
 
     public void DestroyItem(GameObject item)
@@ -228,4 +237,15 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < boxPacks.Count; i++)
             boxPacks[i].GetComponent<Box>().IsInvincibility = isInvincibility;
     }
+
+    public void FixedUpdate()
+    {
+
+    }
+
+    public void Destroy()
+    {
+        instance = null;
+    }
+
 }

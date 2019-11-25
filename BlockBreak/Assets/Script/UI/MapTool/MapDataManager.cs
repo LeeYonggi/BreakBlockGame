@@ -269,10 +269,10 @@ public class MapDataManager : MonoBehaviour
 
     public void OnClickGameStart()
     {
-        DataManager.Instance.IsMapToolDirect = true;
-        DataManager.Instance.NowStage = 1;
-        DataManager.Instance.StageFileInfo = nowFileInfo;
+        MainManager.Instance.StageInfo.isMapToolDirect = true;
+        MainManager.Instance.StageInfo.nowStage = 1;
+        MainManager.Instance.StageInfo.stageFileInfo = nowFileInfo;
 
-        SceneManager.LoadScene(1);
+        Manager.SceneManager.Instance.ChangeScene(1);
     }
 }

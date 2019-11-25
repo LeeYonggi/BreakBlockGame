@@ -40,8 +40,8 @@ public class StageSelectUI : MonoBehaviour
 
     public void OnClickUI()
     {
-        SceneManager.LoadScene(1);
-        DataManager.Instance.ResourceMapPath = $"MapFile/map2/mapdata{label.text}";
-        DataManager.Instance.NowStage = int.Parse(label.text);
+        Manager.SceneManager.Instance.ChangeScene(1);
+        MainManager.Instance.StageInfo.resourceMapPath = $"MapFile/map2/mapdata{label.text}";
+        MainManager.Instance.StageInfo.nowStage = int.Parse(label.text);
     }
 }

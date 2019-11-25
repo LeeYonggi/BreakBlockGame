@@ -94,7 +94,7 @@ public class Box : MonoBehaviour
 
         if (boxStatus.boxCount < 1)
         {
-            GameManager.Instance.DestroyBox(gameObject);
+            InGameManager.Instance.DestroyBox(gameObject);
 
             //Camera.main.GetComponent<CameraController>().CameraShake(0.05f, 0.6f);
         }

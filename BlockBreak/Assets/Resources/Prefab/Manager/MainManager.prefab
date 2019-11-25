@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2820544227539002406
+--- !u!1 &2484262031420633406
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,45 +8,44 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2820544227539002400}
-  - component: {fileID: 2820544227539002401}
+  - component: {fileID: 2484262031420633404}
+  - component: {fileID: 2484262031420633407}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: MainManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2820544227539002400
+--- !u!4 &2484262031420633404
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2820544227539002406}
+  m_GameObject: {fileID: 2484262031420633406}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 3.7470858, y: -0.62663996, z: -9.8984375}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2820544227539002401
+--- !u!114 &2484262031420633407
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2820544227539002406}
+  m_GameObject: {fileID: 2484262031420633406}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8636225d10860b46af8f2b7874cb7d0, type: 3}
+  m_Script: {fileID: 11500000, guid: 1bc7ddaffaf99844d90c18dbd9b9912a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boxPrefab: {fileID: 6367666209662069887, guid: 34e8cca60a18a704cad23a8897a6601d,
-    type: 3}
-  triangleBoxPrefab: {fileID: 2603001614930906352, guid: 3dc75df589033034884fa9b2e48ab4c9,
-    type: 3}
-  levelUpItem: {fileID: 9178772526252079677, guid: 558417fb242c4ec489e04d087b13ebf1,
-    type: 3}
-  nowCount: 1
+  basicRatio: {x: 720, y: 1280}
+  ballSettingData:
+    shootDelay: 0.05
+    shootSpeed: 10
+    limitDegree: 7
+    maxBallCount: 60

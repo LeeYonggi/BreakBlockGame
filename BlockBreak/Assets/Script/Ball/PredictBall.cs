@@ -79,7 +79,7 @@ public class PredictBall : MonoBehaviour
 
         Vector2 basicPosition = new Vector2(Mathf.Abs(colliderNormal.y), Mathf.Abs(colliderNormal.x)) * rb2D.transform.position;
 
-        return colliderNormal * collider.size * 0.5f + wallPosition + basicPosition + colliderNormal * circleCollider2D.radius;
+        return colliderNormal * collider.bounds.size * 0.5f + wallPosition + basicPosition + colliderNormal * circleCollider2D.radius;
     }
 
     void MoveDirection(Vector2 direction)
