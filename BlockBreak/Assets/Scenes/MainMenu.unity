@@ -440,7 +440,7 @@ MonoBehaviour:
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
   keepAspectRatio: 0
-  aspectRatio: 0.5625
+  aspectRatio: 1.3335937
   mType: 0
   mFillDirection: 4
   mFillAmount: 1
@@ -642,6 +642,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2484262031420633407, guid: 3f716cf8a4dc3a44f81c1fefd6f90f6c,
+        type: 3}
+      propertyPath: ballSettingData.shootDelay
+      value: 0.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 2484262031420633407, guid: 3f716cf8a4dc3a44f81c1fefd6f90f6c,
+        type: 3}
+      propertyPath: ballSettingData.shootSpeed
+      value: 12
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3f716cf8a4dc3a44f81c1fefd6f90f6c, type: 3}
 --- !u!1001 &2808933184147784999
@@ -760,6 +770,51 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 640
+      objectReference: {fileID: 0}
+    - target: {fileID: 2808933184350843902, guid: 003c41ab4d8070645b356cde2691b7aa,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2808933184542209937, guid: 003c41ab4d8070645b356cde2691b7aa,
+        type: 3}
+      propertyPath: mWidth
+      value: 709
+      objectReference: {fileID: 0}
+    - target: {fileID: 2808933184542209937, guid: 003c41ab4d8070645b356cde2691b7aa,
+        type: 3}
+      propertyPath: mHeight
+      value: 1302
+      objectReference: {fileID: 0}
+    - target: {fileID: 2808933184542209937, guid: 003c41ab4d8070645b356cde2691b7aa,
+        type: 3}
+      propertyPath: aspectRatio
+      value: 0.54454684
+      objectReference: {fileID: 0}
+    - target: {fileID: 2808933183568472442, guid: 003c41ab4d8070645b356cde2691b7aa,
+        type: 3}
+      propertyPath: startingRenderQueue
+      value: 3002
+      objectReference: {fileID: 0}
+    - target: {fileID: 2808933183568472442, guid: 003c41ab4d8070645b356cde2691b7aa,
+        type: 3}
+      propertyPath: mClipRange.x
+      value: 0.000061035156
+      objectReference: {fileID: 0}
+    - target: {fileID: 2808933183568472442, guid: 003c41ab4d8070645b356cde2691b7aa,
+        type: 3}
+      propertyPath: mClipRange.z
+      value: 709.0001
+      objectReference: {fileID: 0}
+    - target: {fileID: 2808933183568472442, guid: 003c41ab4d8070645b356cde2691b7aa,
+        type: 3}
+      propertyPath: mClipRange.w
+      value: 1302
+      objectReference: {fileID: 0}
+    - target: {fileID: 2808933183568472442, guid: 003c41ab4d8070645b356cde2691b7aa,
+        type: 3}
+      propertyPath: mClipping
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 003c41ab4d8070645b356cde2691b7aa, type: 3}

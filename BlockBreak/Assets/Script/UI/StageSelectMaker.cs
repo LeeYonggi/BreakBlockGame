@@ -13,9 +13,14 @@ public class StageSelectMaker : MonoBehaviour
 
     private UIGrid uiGrid = null;
 
+    private BoxCollider mBoxCollider = null;
+
+    public Vector2 BoxSize { get => mBoxCollider.size; }
+
     private void Awake()
     {
         uiGrid = GetComponent<UIGrid>();
+        mBoxCollider = selectUI.GetComponent<BoxCollider>();
 
         int count = 1;
 

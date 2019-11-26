@@ -46,7 +46,7 @@ public class Ball : MonoBehaviour
         switch (BallState)
         {
             case BALL_STATE.BALL_STOP:
-                bounceComponent.enabled = false;
+                bounceComponent.ResetPrevBounceObj();
 
                 break;
             case BALL_STATE.BALL_MOVE:
@@ -59,7 +59,7 @@ public class Ball : MonoBehaviour
 
                 break;
             case BALL_STATE.BALL_FOLLOW:
-                bounceComponent.enabled = false;
+                bounceComponent.ResetPrevBounceObj();
 
                 //FollowFirstBall();
 

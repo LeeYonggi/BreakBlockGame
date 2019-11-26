@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Manager
 {
@@ -18,6 +19,8 @@ namespace Manager
         UnityEngine.SceneManagement.Scene nowScene = default;       // 현재 씬
 
         List<BaseManager> managerList = new List<BaseManager>();    // 관리할 매니져리스트
+
+        bool isSceneLoaded = false;                                 // 씬이 로드되었는지
 
         public SceneManager()
         {
@@ -35,7 +38,7 @@ namespace Manager
         {
             nowScene = arg1;
 
-            ChangeSceneAwake();
+            isSceneLoaded = true;
         }
 
         public void Start()
@@ -77,6 +80,9 @@ namespace Manager
 
         public void Update()
         {
+            if(isSceneLoaded)
+                ChangeSceneAwake();
+
             foreach (var manager in managerList)
             {
                 manager.Update();
@@ -91,7 +97,7 @@ namespace Manager
             }
         }
 
-        public void ChangeScene(int buildNumber)
+        public void ChangeScene(int buildNumber) // enum 값으로
         {
             UnityEngine.SceneManagement.SceneManager.LoadScene(buildNumber);
         }
@@ -103,9 +109,11 @@ namespace Manager
             Awake();
 
             Start();
+
+            isSceneLoaded = false;
         }
 
-        private void DestroyScenes()
+        private void DestroyScenes()    // find로 찾는 애들 깨짐
         {
             while(managerList.Count > 0)
             {

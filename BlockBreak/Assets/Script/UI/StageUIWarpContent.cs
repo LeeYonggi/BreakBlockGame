@@ -8,6 +8,8 @@ public class StageUIWarpContent : UIWrapContent
     private List<StageSelectLine> mUIChildren = new List<StageSelectLine>();
     private new LinkedList<StageSelectLine> mChildren = new LinkedList<StageSelectLine>();
 
+    bool isMoveStage = false;
+
     [ContextMenu("Sort Based on Scroll Movement")]
     public override void SortBasedOnScrollMovement()
     {
@@ -36,8 +38,6 @@ public class StageUIWarpContent : UIWrapContent
         for (int i = 0; i < objList.Count; i++)
             mChildren.AddLast(objList[i].GetComponent<StageSelectLine>());
 
-        if(MainManager.Instance.StageInfo.nowStage != 0)
-            MoveToStage(MainManager.Instance.StageInfo.nowStage);
     }
 
     public override void WrapContent()
@@ -95,9 +95,9 @@ public class StageUIWarpContent : UIWrapContent
                 UIStageDown(node.Value, mChildren.Last.Value);
 
                 mChildren.AddLast(node.Value);
-                
+
                 var nextNode = node.Next;
-                
+
                 mChildren.Remove(node);
                 node = nextNode;
             }
@@ -137,7 +137,7 @@ public class StageUIWarpContent : UIWrapContent
                 //    NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
             }
             // 스테이지 번호 바꿈
-            if(isUp)
+            if (isUp)
             {
                 UIStageUp(node.Value, mChildren.First.Value);
 
@@ -158,6 +158,16 @@ public class StageUIWarpContent : UIWrapContent
         mScroll.InvalidateBounds();
     }
 
+    private void Update()
+    {
+        if (isMoveStage == false)
+        {
+            if (MainManager.Instance.StageInfo.nowStage != 0)
+                MoveToStage(MainManager.Instance.StageInfo.nowStage);
+            isMoveStage = true;
+        }
+    }
+
     /// <summary>
     /// 스크롤바가 해당 스테이지 포지션으로 이동
     /// </summary>
@@ -165,12 +175,13 @@ public class StageUIWarpContent : UIWrapContent
     public void MoveToStage(int stageNumber)
     {
         Vector3 targetPosition = mScroll.transform.localPosition;
+        UIPanel scrollPanel = mScroll.GetComponent<UIPanel>();
+        Vector2 boxSize = GetComponent<StageSelectMaker>().BoxSize;
 
-        Vector3[] corners = mPanel.worldCorners;
+        float scrollDistance = scrollPanel.GetViewSize().y;
+        float maxPos = (maxIndex - minIndex) * itemSize - scrollDistance * 0.5f + boxSize.y * 0.5f;
 
-        float scrollDistance = mScroll.GetComponent<UIPanel>().GetViewSize().y;
-        float maxPos = (maxIndex - minIndex + 1) * itemSize - scrollDistance;
-        targetPosition.y = ((stageNumber - 1) / 5) * itemSize;
+        targetPosition.y = ((stageNumber - 1) / 5) * itemSize + scrollDistance * 0.5f - boxSize.y * 0.5f;
 
         if (maxPos < targetPosition.y)
             targetPosition.y = maxPos;

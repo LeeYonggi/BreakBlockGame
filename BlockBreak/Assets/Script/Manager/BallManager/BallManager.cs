@@ -470,13 +470,14 @@ public class BallManager : Singleton<BallManager>, BaseManager
 
     public void BallReturn()
     {
+        if (ballPacks.Count == 0) return;
+
         StopBallLoop();
 
         FirstBall = FindStopBall();
 
         for (int i = 0; i < ballPacks.Count; i++)
             ballPacks[i].FollowBallInit();
-
     }
 
     public GameObject FindStopBall()

@@ -173,7 +173,7 @@ public class PhysicsBounceObject : MonoBehaviour
         return basicDistance;
     }
 
-    private void OnEnable()
+    public void ResetPrevBounceObj()
     {
         preBounceObject = null;
     }

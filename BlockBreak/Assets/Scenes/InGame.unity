@@ -137,7 +137,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4714839}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 360, y: -640, z: 0}
+  m_LocalPosition: {x: 355, y: -768, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 760012249}
@@ -1035,15 +1035,15 @@ PrefabInstance:
       propertyPath: m_LocalScale.x
       value: -1
       objectReference: {fileID: 0}
-    - target: {fileID: 2603001614930906354, guid: 3dc75df589033034884fa9b2e48ab4c9,
-        type: 3}
-      propertyPath: boxStatus.boxCount
-      value: 33
-      objectReference: {fileID: 0}
     - target: {fileID: 2603001614930906349, guid: 3dc75df589033034884fa9b2e48ab4c9,
         type: 3}
       propertyPath: m_FlipX
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2603001614930906354, guid: 3dc75df589033034884fa9b2e48ab4c9,
+        type: 3}
+      propertyPath: boxStatus.boxCount
+      value: 33
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3dc75df589033034884fa9b2e48ab4c9, type: 3}
@@ -1078,7 +1078,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 171867170}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -640, z: 0}
+  m_LocalPosition: {x: 0, y: -768, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 647509047}
@@ -1129,7 +1129,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 207002001}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -360, y: -640, z: 0}
+  m_LocalPosition: {x: -355, y: -768, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1540571502}
@@ -1168,6 +1168,7 @@ GameObject:
   - component: {fileID: 217299789}
   - component: {fileID: 217299788}
   - component: {fileID: 217299791}
+  - component: {fileID: 217299792}
   m_Layer: 8
   m_Name: TimeFaster
   m_TagString: Untagged
@@ -1230,11 +1231,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 0}
-    mMethodName: GameSpeedUp
-    mParameters: []
-    oneShot: 0
+  onClick: []
 --- !u!65 &217299790
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1310,6 +1307,18 @@ MonoBehaviour:
   mShader: {fileID: 4800000, guid: e75727d9555d9d14ca51d91908c681bc, type: 3}
   mBorder: {x: 0, y: 0, z: 0, w: 0}
   mFixedAspect: 0
+--- !u!114 &217299792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 217299786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6dd6b9836351f9479f72c8e41af6b17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &218086600
 GameObject:
   m_ObjectHideFlags: 0
@@ -2351,7 +2360,7 @@ Transform:
   m_GameObject: {fileID: 531115475}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 14, y: 0, z: 0}
-  m_LocalScale: {x: 0.0015625, y: 0.0015625, z: 0.0015625}
+  m_LocalScale: {x: 0.0013020834, y: 0.0013020834, z: 0.0013020834}
   m_Children:
   - {fileID: 96451215}
   - {fileID: 995832796}
@@ -2376,6 +2385,7 @@ GameObject:
   - component: {fileID: 534443864}
   - component: {fileID: 534443863}
   - component: {fileID: 534443862}
+  - component: {fileID: 534443866}
   m_Layer: 8
   m_Name: FireBall
   m_TagString: Untagged
@@ -2509,6 +2519,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 166, y: 50, z: 0}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &534443866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 534443860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 520e8a564742a334c83149338cc583f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &534669902
 GameObject:
   m_ObjectHideFlags: 0
@@ -2828,6 +2850,7 @@ GameObject:
   - component: {fileID: 647509050}
   - component: {fileID: 647509049}
   - component: {fileID: 647509048}
+  - component: {fileID: 647509052}
   m_Layer: 8
   m_Name: DownButton
   m_TagString: Untagged
@@ -2952,11 +2975,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 0}
-    mMethodName: BallReturn
-    mParameters: []
-    oneShot: 0
+  onClick: []
 --- !u!65 &647509051
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2970,6 +2989,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 144, y: 144, z: 0}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &647509052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 647509046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc9c13e61762e4848a6b84c88bcb4959, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &671862664
 GameObject:
   m_ObjectHideFlags: 0
@@ -3338,6 +3369,7 @@ GameObject:
   - component: {fileID: 760012252}
   - component: {fileID: 760012251}
   - component: {fileID: 760012250}
+  - component: {fileID: 760012254}
   m_Layer: 8
   m_Name: ResetBall
   m_TagString: Untagged
@@ -3457,13 +3489,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 0}
-    mMethodName: OnResetBallClick
-    mParameters:
-    - obj: {fileID: 278252003}
-      field: text
-    oneShot: 0
+  onClick: []
 --- !u!65 &760012253
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3477,6 +3503,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 166, y: 50, z: 0}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &760012254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 760012248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7b259daee964654f895395abedc7235, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputLabel: {fileID: 278252003}
 --- !u!1001 &848839949
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3859,7 +3898,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 995832795}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -360, y: 640, z: 0}
+  m_LocalPosition: {x: -355, y: 768, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 482272031}
@@ -4704,7 +4743,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1516140236}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 360, y: 640, z: 0}
+  m_LocalPosition: {x: 355, y: 768, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 217299787}
@@ -4743,8 +4782,9 @@ GameObject:
   - component: {fileID: 1540571505}
   - component: {fileID: 1540571504}
   - component: {fileID: 1540571503}
+  - component: {fileID: 1540571507}
   m_Layer: 8
-  m_Name: InvincivleBox
+  m_Name: InvincibleBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4862,11 +4902,7 @@ MonoBehaviour:
   pressedSprite2D: {fileID: 0}
   disabledSprite2D: {fileID: 0}
   pixelSnap: 0
-  onClick:
-  - mTarget: {fileID: 0}
-    mMethodName: OnInvincibleBox
-    mParameters: []
-    oneShot: 0
+  onClick: []
 --- !u!65 &1540571506
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4880,6 +4916,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 220, y: 50, z: 0}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1540571507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1540571501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8fc75a6826535d41ad02f71ca19b33f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1599042236
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6103,6 +6151,7 @@ GameObject:
   - component: {fileID: 2119915640}
   - component: {fileID: 2119915639}
   - component: {fileID: 2119915638}
+  - component: {fileID: 2119915642}
   m_Layer: 8
   m_Name: ResetAngle
   m_TagString: Untagged
@@ -6236,6 +6285,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 166, y: 50, z: 0}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2119915642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2119915636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fe7fc78586796d4aad941352b41e482, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputLabel: {fileID: 2042313525}
 --- !u!1001 &1676240144645698807
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6303,15 +6365,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1676240143792471121, guid: 7c90f0a358e21fb41ad3f87b7bf9db70,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 3.21
-      objectReference: {fileID: 0}
     - target: {fileID: 1676240144323497823, guid: 7c90f0a358e21fb41ad3f87b7bf9db70,
         type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.21
+      objectReference: {fileID: 0}
+    - target: {fileID: 1676240143792471121, guid: 7c90f0a358e21fb41ad3f87b7bf9db70,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.21
       objectReference: {fileID: 0}
     - target: {fileID: 1676240144144757622, guid: 7c90f0a358e21fb41ad3f87b7bf9db70,
         type: 3}
@@ -6347,6 +6409,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1676240144323497808, guid: 7c90f0a358e21fb41ad3f87b7bf9db70,
+        type: 3}
+      propertyPath: m_Offset.y
+      value: -0.0055339336
+      objectReference: {fileID: 0}
+    - target: {fileID: 1676240144323497808, guid: 7c90f0a358e21fb41ad3f87b7bf9db70,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 7.288632
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7c90f0a358e21fb41ad3f87b7bf9db70, type: 3}
