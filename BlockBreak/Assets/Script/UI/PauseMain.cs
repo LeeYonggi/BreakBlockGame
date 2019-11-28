@@ -57,7 +57,7 @@ public class PauseMain : MonoBehaviour
 
         Time.timeScale = InGameManager.Instance.GetStateToTime(InGameManager.Instance.TimeState);
 
-        Manager.SceneManager.Instance.ChangeScene(0);
+        Manager.GameSceneManager.Instance.ChangeScene(Manager.GameSceneManager.SCENE_KIND.MAIN_MENU);
     }
 
     public void OnRePlayButton()
@@ -66,7 +66,7 @@ public class PauseMain : MonoBehaviour
 
         Time.timeScale = InGameManager.Instance.GetStateToTime(InGameManager.Instance.TimeState);
 
-        Manager.SceneManager.Instance.ChangeScene(1);
+        Manager.GameSceneManager.Instance.ChangeScene(Manager.GameSceneManager.SCENE_KIND.INGAME);
     }
 
     IEnumerator ActiveOffCoroutine(float time)

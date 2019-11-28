@@ -245,7 +245,37 @@ public class InGameManager : Singleton<InGameManager>, BaseManager
 
     public void Destroy()
     {
+        ObjectsDestroy();
+
         instance = null;
     }
 
+    private void ObjectsDestroy()
+    {
+        for(int i = 0; i < boxPacks.Count; i++)
+        {
+            if(boxPacks[i] == null)
+            {
+                continue;
+            }
+
+            GameObject.Destroy(boxPacks[i].gameObject);
+            boxPacks[i] = null;
+        }
+
+        boxPacks.Clear();
+
+        for(int i = 0; i < itemPacks.Count; i++)
+        {
+            if(itemPacks[i] == null)
+            {
+                continue;
+            }
+
+            GameObject.Destroy(itemPacks[i].gameObject);
+            itemPacks[i] = null;
+        }
+
+        itemPacks.Clear();
+    }
 }

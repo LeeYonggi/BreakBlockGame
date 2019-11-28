@@ -152,9 +152,7 @@ public class Ball : MonoBehaviour
         if (BallManager.Instance.FirstBall)
             firstBallPos = BallManager.Instance.FirstBall.transform.position;
 
-        transform.DOMove(firstBallPos, 0.7f).SetEase(Ease.InOutQuint);
-        //transform.DOMoveY(firstBallPos.y, 0.7f).SetEase(Ease.InSine);
-        //transform.DOMoveX(firstBallPos.x, 0.7f).SetEase(Ease.InSine);
+        transform.DOMove(firstBallPos, 0.4f).SetEase(Ease.InCirc);
 
         StartCoroutine(FollowTimeCoroutine(0.7f));
     }

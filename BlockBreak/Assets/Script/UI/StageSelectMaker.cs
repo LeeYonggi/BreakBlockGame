@@ -30,7 +30,7 @@ public class StageSelectMaker : MonoBehaviour
 
             for (int child = 0; child < obj.transform.childCount; ++child)
             {
-                StageSelectUI uiLabel = obj.transform.GetChild(child).GetComponent<StageSelectUI>();
+                StageSelectButton uiLabel = obj.transform.GetChild(child).GetComponent<StageSelectButton>();
 
                 uiLabel.StageNumber = count;
 

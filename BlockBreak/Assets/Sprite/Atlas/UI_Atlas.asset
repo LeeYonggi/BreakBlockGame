@@ -14,17 +14,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: 515c6027987d3a44ab68edeec9c13012, type: 2}
   mSprites:
-  - name: hexagon
+  - name: Close
     x: 0
+    y: 42
+    width: 470
+    height: 470
+    borderLeft: 0
+    borderRight: 0
+    borderTop: 0
+    borderBottom: 0
+    paddingLeft: 21
+    paddingRight: 21
+    paddingTop: 21
+    paddingBottom: 21
+  - name: hexagon
+    x: 471
     y: 0
-    width: 511
+    width: 444
     height: 512
     borderLeft: 0
     borderRight: 0
     borderTop: 0
     borderBottom: 0
-    paddingLeft: 1
-    paddingRight: 0
+    paddingLeft: 34
+    paddingRight: 34
     paddingTop: 0
     paddingBottom: 0
   mPixelSize: 1

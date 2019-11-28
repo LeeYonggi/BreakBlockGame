@@ -11,6 +11,10 @@ namespace UIForm
     {
         protected GameObject uiObject = null;
 
+        public delegate void OnEnableFunc();
+
+        public event OnEnableFunc openEvent = null;
+
         
         public virtual void Start() { }
         public virtual void Update() { }
@@ -18,5 +22,17 @@ namespace UIForm
         public virtual void Destroy() { }
 
 
+        public void OpenForm()
+        {
+            uiObject.SetActive(true);
+
+            openEvent?.Invoke();
+        }
+        public void CloseForm()
+        {
+            uiObject.SetActive(false);
+
+            openEvent?.Invoke();
+        }
     }
 }

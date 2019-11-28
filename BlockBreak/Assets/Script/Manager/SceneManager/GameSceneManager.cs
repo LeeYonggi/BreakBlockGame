@@ -1,50 +1,58 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Manager
 {
-    class SceneManager : Singleton<SceneManager>
+    class GameSceneManager : Singleton<GameSceneManager>
     {
-        enum SCENE_KIND
+        public enum SCENE_KIND
         {
             MAIN_MENU = 0,
             INGAME    = 1,
             MAPTOOL   = 2
         }
 
-        UnityEngine.SceneManagement.Scene nowScene = default;       // 현재 씬
+        Scene nowScene = default;                                   // 현재 씬
 
         List<BaseManager> managerList = new List<BaseManager>();    // 관리할 매니져리스트
 
         bool isSceneLoaded = false;                                 // 씬이 로드되었는지
 
-        public SceneManager()
+        public GameSceneManager()
         {
-            nowScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+        }
+
+        private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
+        {
+            nowScene = arg0;
+
+            isSceneLoaded = true;
+
+            ChangeSceneAwake();
+
+            Debug.Log($"LoadSceneMode : {arg1}");
         }
 
         public void Awake()
         {
+            DestroyScenes();
+
             AddManager((SCENE_KIND)nowScene.buildIndex);
 
             AwakeManager();
+
+            StartManager();
         }
 
-        private void SceneManager_activeSceneChanged(UnityEngine.SceneManagement.Scene arg0, UnityEngine.SceneManagement.Scene arg1)
+        public void StartManager()
         {
-            nowScene = arg1;
-
-            isSceneLoaded = true;
-        }
-
-        public void Start()
-        {
-            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
-
             foreach (var manager in managerList)
             {
                 manager.Start();
@@ -56,6 +64,7 @@ namespace Manager
             switch (sceneKind)
             {
                 case SCENE_KIND.MAIN_MENU:
+                    managerList.Add(MainMenuFormManager.Instance);
 
                     break;
                 case SCENE_KIND.INGAME:
@@ -67,6 +76,8 @@ namespace Manager
                 case SCENE_KIND.MAPTOOL:
                     break;
             }
+
+            managerList.Add(NGUIFormManager.Instance);
         }
 
 
@@ -80,9 +91,6 @@ namespace Manager
 
         public void Update()
         {
-            if(isSceneLoaded)
-                ChangeSceneAwake();
-
             foreach (var manager in managerList)
             {
                 manager.Update();
@@ -97,23 +105,42 @@ namespace Manager
             }
         }
 
-        public void ChangeScene(int buildNumber) // enum 값으로
+        public void ChangeScene(SCENE_KIND scene) 
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(buildNumber);
+            GameObject loadScreen = Resources.Load("Prefab/UI/Loading/LoadScreen") as GameObject;
+
+            loadScreen = GameObject.Instantiate(loadScreen);
+
+            MainManager.Instance.StartCoroutine(LoadScene(scene));
+        }
+
+        IEnumerator LoadScene(SCENE_KIND sceneNumber)
+        {
+            AsyncOperation asyncOperation = SceneManager.LoadSceneAsync((int)sceneNumber);
+
+            asyncOperation.allowSceneActivation = false;
+
+            DestroyScenes();    // find로 찾는 애들 깨질 수 있으니 바로 삭제시켜줌
+
+            while(!asyncOperation.isDone)
+            {
+                Debug.Log($"Load progress : {asyncOperation.progress}");
+
+                if (asyncOperation.progress >= 0.9f)
+                    asyncOperation.allowSceneActivation = true;
+
+                yield return null;
+            }
         }
 
         private void ChangeSceneAwake()
         {
-            DestroyScenes();
-
             Awake();
-
-            Start();
 
             isSceneLoaded = false;
         }
 
-        private void DestroyScenes()    // find로 찾는 애들 깨짐
+        private void DestroyScenes()    
         {
             while(managerList.Count > 0)
             {

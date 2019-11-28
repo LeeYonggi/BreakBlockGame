@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class StageSelectLine : MonoBehaviour
 {
-    private List<StageSelectUI> stageUIList = new List<StageSelectUI>();
+    private List<StageSelectButton> stageUIList = new List<StageSelectButton>();
 
     private void Awake()
     {
         for(int i = 0; i < transform.childCount; i++)
         {
-            stageUIList.Add(transform.GetChild(i).GetComponent<StageSelectUI>());
+            stageUIList.Add(transform.GetChild(i).GetComponent<StageSelectButton>());
         }
     }
 

@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class StageSelectUI : MonoBehaviour
+public class StageSelectButton : MonoBehaviour
 {
     private UILabel label = null;
     private UIButton uiButton = null;
@@ -40,7 +40,7 @@ public class StageSelectUI : MonoBehaviour
 
     public void OnClickUI()
     {
-        Manager.SceneManager.Instance.ChangeScene(1);
+        Manager.GameSceneManager.Instance.ChangeScene(Manager.GameSceneManager.SCENE_KIND.INGAME);
         MainManager.Instance.StageInfo.resourceMapPath = $"MapFile/map2/mapdata{label.text}";
         MainManager.Instance.StageInfo.nowStage = int.Parse(label.text);
     }

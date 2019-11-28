@@ -20,7 +20,7 @@ public class MainManager : MonoBehaviour
 
     private StageData stageInfo = new StageData();
 
-    private Manager.SceneManager sceneManager = null;
+    private Manager.GameSceneManager sceneManager = null;
 
 
     private void Awake()
@@ -52,7 +52,6 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ManagerStart();
     }
 
     // Update is called once per frame
@@ -69,15 +68,9 @@ public class MainManager : MonoBehaviour
     #region Manager management
     private void ManagerAwake()
     {
-        sceneManager = Manager.SceneManager.Instance;
-
-        sceneManager.Awake();
+        sceneManager = Manager.GameSceneManager.Instance;
     }
 
-    private void ManagerStart()
-    {
-        sceneManager.Start();
-    }
 
     private void ManagerUpdate()
     {

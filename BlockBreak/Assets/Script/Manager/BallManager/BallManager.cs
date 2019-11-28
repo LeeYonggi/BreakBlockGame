@@ -406,7 +406,7 @@ public class BallManager : Singleton<BallManager>, BaseManager
             angle = Mathf.Acos(Vector2.Dot(directionVec2, new Vector2(-1, 0))) * Mathf.Rad2Deg + 180;
 
 
-        Debug.Log(angle);
+        Debug.Log($"Fire Angle : {angle}");
     }
 
     // 방향 백터를 구한 뒤, 공 발사 상태로 전환시켜주는 함수.
@@ -496,7 +496,23 @@ public class BallManager : Singleton<BallManager>, BaseManager
 
     public void Destroy()
     {
+        BallDestroy();
         instance = null;
     }
 
+    private void BallDestroy()
+    {
+        for (int i = 0; i < ballPacks.Count; i++)
+        {
+            if (!ballPacks[i])
+            {
+                continue;
+            }
+
+            GameObject.Destroy(ballPacks[i].gameObject);
+            ballPacks[i] = null;
+        }
+
+        ballPacks.Clear();
+    }
 }

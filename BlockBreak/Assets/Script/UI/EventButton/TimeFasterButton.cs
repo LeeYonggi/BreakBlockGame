@@ -22,6 +22,7 @@ public class TimeFasterButton : MonoBehaviour
 
     void TimeFaster()
     {
-        InGameManager.Instance.ChangeTimeState(InGameManager.Instance.TimeState);
+        InGameManager.Instance.TimeState = InGameManager.Instance.ChangeTimeState(InGameManager.Instance.TimeState);
+        Time.timeScale = InGameManager.Instance.GetStateToTime(InGameManager.Instance.TimeState);
     }
 }

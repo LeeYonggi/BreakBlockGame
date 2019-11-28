@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using Manager;
 
 public class MoveScene : MonoBehaviour
 {
@@ -25,6 +25,6 @@ public class MoveScene : MonoBehaviour
 
     public void MoveToScene()
     {
-        Manager.SceneManager.Instance.ChangeScene(nextScene);
+        GameSceneManager.Instance.ChangeScene((GameSceneManager.SCENE_KIND)nextScene);
     }
 }

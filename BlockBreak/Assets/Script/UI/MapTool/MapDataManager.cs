@@ -273,6 +273,6 @@ public class MapDataManager : MonoBehaviour
         MainManager.Instance.StageInfo.nowStage = 1;
         MainManager.Instance.StageInfo.stageFileInfo = nowFileInfo;
 
-        Manager.SceneManager.Instance.ChangeScene(1);
+        Manager.GameSceneManager.Instance.ChangeScene(Manager.GameSceneManager.SCENE_KIND.INGAME);
     }
 }

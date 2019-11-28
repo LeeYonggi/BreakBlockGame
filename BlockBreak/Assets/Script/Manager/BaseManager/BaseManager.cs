@@ -20,6 +20,14 @@ namespace Manager
                 return instance;
             }
         }
+
+        public void DestroyInstance()
+        {
+            if (instance == null)
+                return;
+
+            instance = null;
+        }
     }
 
     public interface BaseManager
