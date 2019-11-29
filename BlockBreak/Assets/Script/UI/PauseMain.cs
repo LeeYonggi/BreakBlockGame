@@ -62,11 +62,6 @@ public class PauseMain : MonoBehaviour
 
     public void OnRePlayButton()
     {
-        gameObject.SetActive(false);
-
-        Time.timeScale = InGameManager.Instance.GetStateToTime(InGameManager.Instance.TimeState);
-
-        Manager.GameSceneManager.Instance.ChangeScene(Manager.GameSceneManager.SCENE_KIND.INGAME);
     }
 
     IEnumerator ActiveOffCoroutine(float time)

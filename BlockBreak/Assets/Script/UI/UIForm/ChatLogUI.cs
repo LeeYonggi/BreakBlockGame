@@ -11,40 +11,31 @@ namespace UIForm
 {
     class ChatLogUI : NGUIForm
     {
-        public ChatLogUI()
-        {
-
-        }
-
         public override void Start()
         {
-            GameObject chatPrefab = Resources.Load("Prefab/UI/MainMenu/ChatLogUI") as GameObject;
+            base.Start();
 
-            uiObject = GameObject.Instantiate(chatPrefab, NGUIFormManager.Instance.NowUIRoot.transform);
-
-            var openLogButton = uiObject.transform.Find("ChatLogUIWindow/Close").gameObject;
-
-            UIEventListener.Get(openLogButton).onClick = CloseLog;
+            AddChildClickEvent("ChatLogUIWindow/Close", CloseChatLog);
         }
 
         public override void Update()
         {
-
+            base.Update();
         }
 
         public override void FixedUpdate()
         {
-
+            base.FixedUpdate();
         }
 
         public override void Destroy()
         {
-
+            base.Destroy();
         }
 
-        public void CloseLog(GameObject gameObject)
+        void CloseChatLog()
         {
-            NGUIFormManager.Instance.CloseWindow(gameObject, "UIForm.ChatLogUI");
+            NGUIFormManager.Instance.CloseWindow("UIForm.ChatLogUI");
         }
     }
 }

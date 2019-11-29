@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using Manager;
+using System;
 
 public class StageData
 {
@@ -37,10 +38,17 @@ public class StageManager : Singleton<StageManager>, BaseManager
 
     public void Start()
     {
-        if (MainManager.Instance.StageInfo.isMapToolDirect)
-            CreateMapToolStage();
-        else
-            CreateStageMap();
+        try
+        {
+            if (MainManager.Instance.StageInfo.isMapToolDirect)
+                CreateMapToolStage();
+            else
+                CreateStageMap();
+        }
+        catch(Exception e)
+        {
+            Debug.LogError(e.Message);
+        }
 
         MainManager.Instance.StageInfo.isMapToolDirect = false;
     }

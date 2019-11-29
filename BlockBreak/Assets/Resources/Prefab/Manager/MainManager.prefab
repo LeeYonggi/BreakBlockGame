@@ -45,7 +45,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   basicRatio: {x: 720, y: 1280}
   ballSettingData:
-    shootDelay: 0.05
-    shootSpeed: 10
+    shootDelay: 0.08
+    shootSpeed: 13
     limitDegree: 7
     maxBallCount: 60

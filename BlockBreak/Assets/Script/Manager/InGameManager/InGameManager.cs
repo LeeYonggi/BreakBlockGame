@@ -57,6 +57,10 @@ public class InGameManager : Singleton<InGameManager>, BaseManager
         levelUpItem = Resources.Load("Prefab/Item/LevelUpItem") as GameObject;
 
         transformParent = new GameObject("BoxAndItemPack");
+
+        NGUIFormManager.Instance.AddPrefabResource("Prefab/UI/InGame/InGameMainUI");
+        NGUIFormManager.Instance.AddPrefabResource("Prefab/UI/InGame/PauseUI");
+        NGUIFormManager.Instance.OpenWindow("UIForm.InGameMainUI");
     }
 
     public void Awake()
@@ -75,7 +79,6 @@ public class InGameManager : Singleton<InGameManager>, BaseManager
 
     public void Start()
     {
-    
     }
 
     // Update is called once per frame

@@ -13,20 +13,10 @@ namespace UIForm
     {
         public override void Start()
         {
-            GameObject uiPrefab = Resources.Load("Prefab/UI/MainMenu/StageSelectUI") as GameObject;
-
-            uiObject = GameObject.Instantiate(uiPrefab);
-
-            var openLogButton = uiObject.transform.Find("LeftTop/ChatLogButton").gameObject;
-
-            UIEventListener.Get(openLogButton).onClick = OpenLog;
-
             base.Start();
-        }
-
-        public void OpenLog(GameObject gameObject)
-        {
-            NGUIFormManager.Instance.OpenWindow(gameObject, "UIForm.ChatLogUI");
+            
+            // 함수를 통해 OpenWindow 호출
+            AddChildClickEvent("LeftTop/ChatLogButton", OpenChatLog);
         }
 
         public override void Update()
@@ -42,6 +32,11 @@ namespace UIForm
         public override void Destroy()
         {
             base.Destroy();
+        }
+
+        public void OpenChatLog()
+        {
+            NGUIFormManager.Instance.OpenWindow("UIForm.ChatLogUI");
         }
     }
 }

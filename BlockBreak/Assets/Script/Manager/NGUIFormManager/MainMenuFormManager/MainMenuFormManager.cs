@@ -11,9 +11,12 @@ namespace Manager
     {
         public void Awake()
         {
-            NGUIFormManager.Instance.OpenWindow(null, "UIForm.StageSelectUI");
+            NGUIFormManager.Instance.AddPrefabResource("Prefab/UI/MainMenu/StageSelectUI");
+            NGUIFormManager.Instance.AddPrefabResource("Prefab/UI/MainMenu/ChatLogUI");
 
+            NGUIFormManager.Instance.OpenWindow("UIForm.StageSelectUI");
         }
+
         public void Start()
         {
         }
@@ -22,9 +25,11 @@ namespace Manager
         {
 
         }
+
         public void FixedUpdate()
         {
         }
+
         public void Destroy()
         {
         }

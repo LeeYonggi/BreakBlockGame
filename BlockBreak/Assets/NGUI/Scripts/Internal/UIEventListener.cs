@@ -13,8 +13,10 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Internal/Event Listener")]
 public class UIEventListener : MonoBehaviour
 {
+    public delegate void NOParamDelegate ();
 	public delegate void VoidDelegate (GameObject go);
-	public delegate void BoolDelegate (GameObject go, bool state);
+    public delegate void StringDelegate(GameObject go, string name);
+    public delegate void BoolDelegate (GameObject go, bool state);
 	public delegate void FloatDelegate (GameObject go, float delta);
 	public delegate void VectorDelegate (GameObject go, Vector2 delta);
 	public delegate void ObjectDelegate (GameObject go, GameObject obj);
@@ -37,7 +39,9 @@ public class UIEventListener : MonoBehaviour
 	public ObjectDelegate onDrop;
 	public KeyCodeDelegate onKey;
 	public BoolDelegate onTooltip;
-	public bool needsActiveCollider = true;
+    public StringDelegate onClickString;
+    public NOParamDelegate onClickVoid;
+    public bool needsActiveCollider = true;
 
 	bool isColliderEnabled
 	{
@@ -52,7 +56,19 @@ public class UIEventListener : MonoBehaviour
 	}
 
 	void OnSubmit ()				{ if (isColliderEnabled && onSubmit != null) onSubmit(gameObject); }
-	void OnClick ()				{ if (isColliderEnabled && onClick != null) onClick(gameObject); }
+	void OnClick ()				
+    {
+        if (isColliderEnabled && onClick != null)
+        {
+            onClick(gameObject);
+        }
+
+        if (isColliderEnabled && onClickString != null && parameter != null)
+            onClickString(gameObject, parameter as string);
+
+        if(isColliderEnabled && onClickVoid != null)
+            onClickVoid();
+    }
 	void OnDoubleClick ()			{ if (isColliderEnabled && onDoubleClick != null) onDoubleClick(gameObject); }
 	void OnHover (bool isOver)		{ if (isColliderEnabled && onHover != null) onHover(gameObject, isOver); }
 	void OnPress (bool isPressed)	{ if (isColliderEnabled && onPress != null) onPress(gameObject, isPressed); }
@@ -84,7 +100,9 @@ public class UIEventListener : MonoBehaviour
 		onDrop = null;
 		onKey = null;
 		onTooltip = null;
-	}
+        onClickString = null;
+        onClickVoid = null;
+    }
 
 	/// <summary>
 	/// Get or add an event listener to the specified game object.
