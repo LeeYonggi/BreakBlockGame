@@ -7,6 +7,7 @@ public class Ball : MonoBehaviour
 {
     public enum BALL_STATE
     {
+        BALL_IDLE,
         BALL_STOP,
         BALL_MOVE,
         BALL_FOLLOW
@@ -26,6 +27,7 @@ public class Ball : MonoBehaviour
 
     #region Property
     public BALL_STATE BallState { get => ballState; set => ballState = value; }
+    public CircleCollider2D CircleCollider2D { get => circleCollider2D; set => circleCollider2D = value; }
     #endregion
 
     // Start is called before the first frame update
@@ -33,7 +35,7 @@ public class Ball : MonoBehaviour
     {
         rb2D = GetComponent<Rigidbody2D>();
 
-        circleCollider2D = GetComponent<CircleCollider2D>();
+        CircleCollider2D = GetComponent<CircleCollider2D>();
 
         bounceComponent = GetComponent<PhysicsBounceObject>();
 
@@ -45,6 +47,10 @@ public class Ball : MonoBehaviour
     {
         switch (BallState)
         {
+            case BALL_STATE.BALL_IDLE:
+                bounceComponent.ResetPrevBounceObj();
+
+                break;
             case BALL_STATE.BALL_STOP:
                 bounceComponent.ResetPrevBounceObj();
 

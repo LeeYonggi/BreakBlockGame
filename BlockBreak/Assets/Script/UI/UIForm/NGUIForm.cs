@@ -17,6 +17,7 @@ namespace UIForm
         public event OnEnableFunc openEvent = null;     // form을 열어줄 때 호출하는 이벤트
         public event OnEnableFunc closeEvent = null;    // form을 닫아줄 때 호출하는 이벤트
 
+        public bool IsOpen { get => uiObject.activeSelf; }
 
         public virtual void Start() 
         {

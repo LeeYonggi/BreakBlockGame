@@ -15,6 +15,7 @@ namespace Manager
         private Dictionary<string, GameObject> prefabPacks = new Dictionary<string, GameObject>();
 
         private UIRoot nowUIRoot = null;
+        private Camera camera = null;
 
         bool isFirstTouch = true;
 
@@ -29,9 +30,12 @@ namespace Manager
             }
         }
 
+        public Camera Camera { get => camera; set => camera = value; }
+
         public NGUIFormManager()
         {
             nowUIRoot = GameObject.FindObjectOfType<UIRoot>();
+            camera = nowUIRoot?.GetComponentInChildren<Camera>();
         }
 
         public virtual void Awake()
@@ -58,6 +62,8 @@ namespace Manager
 
             temp = GameObject.Instantiate(temp);
             nowUIRoot = temp.AddComponent<UIRoot>();
+
+            camera = nowUIRoot?.GetComponentInChildren<Camera>();
         }
 
         public void Destroy()
@@ -68,6 +74,7 @@ namespace Manager
             }
 
             uiForms.Clear();
+            prefabPacks.Clear();
 
             nowUIRoot = null;
             DestroyInstance();
@@ -77,7 +84,8 @@ namespace Manager
         {
             foreach(var forms in uiForms)
             {
-                forms.Value.FixedUpdate();
+                if(forms.Value.IsOpen)
+                    forms.Value.FixedUpdate();
             }
         }
 
@@ -91,7 +99,8 @@ namespace Manager
 
             foreach(var forms in uiForms)
             {
-                forms.Value.Update();
+                if (forms.Value.IsOpen)
+                    forms.Value.Update();
             }
         }
 
@@ -104,9 +113,6 @@ namespace Manager
         /// 오픈시킬 UIForm의 클래스 이름
         public void OpenWindow(string className)
         {
-            if (isFirstTouch == false)
-                return;
-
             if (uiForms.ContainsKey(className) == false)
             {
                 Type type = Type.GetType(className);
@@ -128,8 +134,6 @@ namespace Manager
             }
 
             uiForms[className].OpenForm();
-
-            isFirstTouch = false;
         }
 
         /// <summary>

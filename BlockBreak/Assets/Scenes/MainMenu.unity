@@ -854,6 +854,31 @@ PrefabInstance:
       propertyPath: topAnchor.target
       value: 
       objectReference: {fileID: 326439865}
+    - target: {fileID: 5749706093773429590, guid: 003c41ab4d8070645b356cde2691b7aa,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749706094808836233, guid: 003c41ab4d8070645b356cde2691b7aa,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 640
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749706093859930344, guid: 003c41ab4d8070645b356cde2691b7aa,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2840
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749706093859930344, guid: 003c41ab4d8070645b356cde2691b7aa,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 640
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749706094213134196, guid: 003c41ab4d8070645b356cde2691b7aa,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 003c41ab4d8070645b356cde2691b7aa, type: 3}
 --- !u!4 &5749706093432827109 stripped

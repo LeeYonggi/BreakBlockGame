@@ -17,6 +17,7 @@ namespace UIForm
 
             AddChildClickEvent("Center/PauseMain/Resume", OnClosePause);
             AddChildClickEvent("Center/PauseMain/Exit", OnExit);
+            AddChildClickEvent("Center/PauseMain/Restart", OnReplay);
 
             openEvent += OnOpenPause;
 

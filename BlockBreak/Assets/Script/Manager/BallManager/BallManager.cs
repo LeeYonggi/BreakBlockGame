@@ -94,6 +94,8 @@ public class BallManager : Singleton<BallManager>, BaseManager
 
     private bool isAngleOption = false;                 // 각도를 직접 ui로 설정하였는가.
 
+    private GameObject ballCountLabel = null;           // 공의 개수 UI
+
 
     private List<Ball> ballPacks = new List<Ball>();    // 볼 관리 리스트
 
@@ -143,6 +145,7 @@ public class BallManager : Singleton<BallManager>, BaseManager
         OnMouseUp += DisableGuidLine;
         OnMouseUp += StepInitialize;
         OnMouseUp += WriteAngleLog;
+        OnMouseUp += ChangeBallState;
     }
 
     public void Start()
@@ -159,6 +162,10 @@ public class BallManager : Singleton<BallManager>, BaseManager
         ballParent = new GameObject("BallPacks");
 
         ballSettingData = MainManager.Instance.BallSettingData;
+
+        NGUIFormManager.Instance.AddPrefabResource("Prefab/UI/InGame/BallCountUI");
+
+        NGUIFormManager.Instance.OpenWindow("UIForm.BallCountUI");
     }
 
     public void OnResetBallClick(string text)
@@ -245,6 +252,9 @@ public class BallManager : Singleton<BallManager>, BaseManager
         guidLine.GuidDirection = secondPosition - firstPosition;
     }
 
+    /// <summary>
+    /// 가이드라인 제거함수
+    /// </summary>
     void DisableGuidLine()
     {
         if (guidLine == null) return;
@@ -339,7 +349,7 @@ public class BallManager : Singleton<BallManager>, BaseManager
     }
 
     /// <summary>
-    /// 마우스를 손에서 때면 불러야 하는 함수
+    /// MouseUp예외처리와 마우스 포지션을 초기화 해주는 함수
     /// </summary>
     /// <param name="keyState"></param>
     void MouseUp(out KEY_STATE keyState)
@@ -421,26 +431,79 @@ public class BallManager : Singleton<BallManager>, BaseManager
         m_FireState = FIRE_STATE.FIRE_ACTIVATION;
     }
 
+    void ChangeBallState()
+    {
+        for(int i = 0; i < ballPacks.Count; i++)
+        {
+            ballPacks[i].BallState = Ball.BALL_STATE.BALL_IDLE;
+        }
+    }
+
     // 공을 발사시켜 주는 루프
     void MoveBallLoop()
     {
-        if(shootDelayCount <= 0.0f)
+        #region 공의 거리를 통해 딜레이를 알아야 할 때
+        bool isShootAble = false;
+        float ballRadius = ballPacks[nowShootindex].CircleCollider2D.radius;
+
+        if (nowShootindex == 0)
+            isShootAble = true;
+        else
         {
-            ballPacks[nowShootindex].BallMove(ballMoveVector, ballSettingData.shootSpeed);
+            Vector2 nowBallPos = ballPacks[nowShootindex].transform.position;
+            Vector2 prevBallPos = ballPacks[nowShootindex - 1].transform.position;
+
+            float distance = Vector2.Distance(nowBallPos, prevBallPos);
+
+            if (distance >= ballRadius * 4.5f)
+            {
+                isShootAble = true;
+            }
+        }
+
+
+        if (isShootAble)
+        {
+            ballPacks[nowShootindex].BallMove(ballMoveVector, ballRadius * 2.3f * 50);
 
             nowShootindex += 1;
 
-            if(nowShootindex >= ballPacks.Count)
+            if (nowShootindex >= ballPacks.Count)
             {
                 StopBallLoop();
             }
             else
-                shootDelayCount = ballSettingData.shootDelay;
+            {
+                Debug.Log(shootDelayCount);
+                shootDelayCount = 0;
+            }
         }
 
-        shootDelayCount -= Time.fixedDeltaTime;
+        shootDelayCount += Time.fixedDeltaTime;
+        #endregion
+
+        #region 공의 딜레이로 발사하고 싶을 때
+        //if (shootDelayCount <= 0.0f)
+        //{
+        //    ballPacks[nowShootindex].BallMove(ballMoveVector, ballSettingData.shootSpeed);
+
+        //    nowShootindex += 1;
+
+        //    if (nowShootindex >= ballPacks.Count)
+        //    {
+        //        StopBallLoop();
+        //    }
+        //    else
+        //        shootDelayCount = ballSettingData.shootDelay;
+        //}
+
+        //shootDelayCount -= Time.fixedDeltaTime;
+        #endregion
     }
 
+    /// <summary>
+    /// 공 발사 루프를 멈춤
+    /// </summary>
     void StopBallLoop()
     {
         shootDelayCount = 0.0f;
@@ -461,6 +524,9 @@ public class BallManager : Singleton<BallManager>, BaseManager
         return true;
     }
 
+    /// <summary>
+    /// 공을 추가해주는 함수
+    /// </summary>
     public void AddBall()
     {
         if (m_FireState.Equals(FIRE_STATE.FIRE_ACTIVATION)) return;
@@ -468,6 +534,9 @@ public class BallManager : Singleton<BallManager>, BaseManager
         CreateBall();
     }
 
+    /// <summary>
+    /// 공을 강제로 내려오게 만드는 함수
+    /// </summary>
     public void BallReturn()
     {
         if (ballPacks.Count == 0) return;
@@ -480,6 +549,11 @@ public class BallManager : Singleton<BallManager>, BaseManager
             ballPacks[i].FollowBallInit();
     }
 
+    /// <summary>
+    /// 멈춘공을 찾음
+    /// </summary>
+    /// <returns></returns>
+    /// 멈춘 공 중 먼저 배열에 들어있는 오브젝트 반환
     public GameObject FindStopBall()
     {
         for (int i = 0; i < ballPacks.Count; i++)
@@ -494,12 +568,32 @@ public class BallManager : Singleton<BallManager>, BaseManager
         return ballPacks[0].gameObject;
     }
 
+    /// <summary>
+    /// 멈추어 있는 공의 개수를 반환
+    /// </summary>
+    /// <returns></returns>
+    public int FindStopBallCount()
+    {
+        int stopBallCount = 0;
+        for (int i = 0; i < ballPacks.Count; i++)
+        {
+            if (ballPacks[i].BallState.Equals(Ball.BALL_STATE.BALL_STOP) ||
+                ballPacks[i].BallState.Equals(Ball.BALL_STATE.BALL_FOLLOW))
+            {
+                stopBallCount += 1;
+            }
+        }
+        return stopBallCount;
+    }
+
     public void Destroy()
     {
         BallDestroy();
         instance = null;
     }
-
+    /// <summary>
+    /// 공 해제
+    /// </summary>
     private void BallDestroy()
     {
         for (int i = 0; i < ballPacks.Count; i++)
