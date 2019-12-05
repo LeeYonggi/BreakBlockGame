@@ -78,11 +78,21 @@ public class BallManager : Singleton<BallManager>, BaseManager
     private FIRE_STATE m_FireState = FIRE_STATE.IDLE;   // 볼 발사 상태
 
     /// <summary>
+    /// 초기화 공 좌표
+    /// </summary>
+    public static readonly Vector2 firstBallInitPosition = new Vector2(0, -3.0f);
+
+    /// <summary>
     /// 첫번째 공 좌표
     /// </summary>
-    private readonly Vector2 firstBallPosition = new Vector2(0, -3.0f);
+    private Vector2 firstBallPosition = firstBallInitPosition;
 
-    private GameObject firstBall = null;                // 첫번째 공
+    /// <summary>
+    /// 내려온 공이 있나
+    /// </summary>
+    private bool isFirstTouch = true;
+
+    // 발사시작 포지션으로 변경
                                                         
     private GameObject ballPrefab = null;               // 공 프리펩
                                                         
@@ -100,12 +110,11 @@ public class BallManager : Singleton<BallManager>, BaseManager
     private List<Ball> ballPacks = new List<Ball>();    // 볼 관리 리스트
 
     #region Property
-    public GameObject FirstBall { get => firstBall; set => firstBall = value; }
-    public Vector2 FirstPosition { get => firstPosition; set => firstPosition = value; }
     public Vector2 SecondPosition { get => secondPosition; set => secondPosition = value; }
     public List<Ball> BallPacks { get => ballPacks; set => ballPacks = value; }
+    public Vector2 FirstBallPosition { get => firstBallPosition; set => firstBallPosition = value; }
+    public bool IsFirstTouch { get => isFirstTouch; set => isFirstTouch = value; }
 
-    public Vector2 FirstBallPosition => firstBallPosition;
     #endregion
 
     public delegate void ActiveControll();
@@ -117,13 +126,8 @@ public class BallManager : Singleton<BallManager>, BaseManager
     GameObject CreateBall()
     {
         GameObject ball = GameObject.Instantiate(ballPrefab, ballParent.transform);
-        
-        if (firstBall)
-            ball.transform.position = firstBall.transform.position;
-        else
-            ball.transform.position = firstBallPosition;
 
-        ballPacks.Add(ball.GetComponent<Ball>());
+        ball.transform.position = FirstBallPosition;
 
         return ball;
     }
@@ -131,7 +135,7 @@ public class BallManager : Singleton<BallManager>, BaseManager
     // 턴이 끝나면 해주는 초기화, 주로 GameManager에서 사용
     public void StepInitialize()
     {
-        FirstBall = null;
+        isFirstTouch = false;
     }
 
     public void Awake()
@@ -142,7 +146,6 @@ public class BallManager : Singleton<BallManager>, BaseManager
         ResetBall(ballSettingData.maxBallCount);
 
         OnMouseUp += FireBallInitalize;
-        OnMouseUp += DisableGuidLine;
         OnMouseUp += StepInitialize;
         OnMouseUp += WriteAngleLog;
         OnMouseUp += ChangeBallState;
@@ -176,22 +179,18 @@ public class BallManager : Singleton<BallManager>, BaseManager
     private void ResetBall(int maxBall)
     {
         for (int i = 0; i < ballPacks.Count; i++)
-            GameObject.Destroy(ballPacks[i].gameObject);
+            GameObject.DestroyImmediate(ballPacks[i].gameObject, true);
 
         ballPacks.Clear();
 
         for (int i = 0; i < maxBall; i++)
-            CreateBall();
+            ballPacks.Add(CreateBall().GetComponent<Ball>());
 
-        FirstBall = ballPacks[0].gameObject;
+        FirstBallPosition = ballPacks[0].gameObject.transform.position;
     }
 
     // Update is called once per frame
     public void Update()
-    {
-    }
-
-    public void FixedUpdate()
     {
         switch (m_FireState)
         {
@@ -204,6 +203,10 @@ public class BallManager : Singleton<BallManager>, BaseManager
                 break;
         }
 
+    }
+
+    public void FixedUpdate()
+    {
         BallFixedUpdate();
     }
 
@@ -268,6 +271,8 @@ public class BallManager : Singleton<BallManager>, BaseManager
         if (Vector2.Distance(firstPosition, secondPosition) < 0.2f ||
             firstPosition.y > secondPosition.y)
             return false;
+        if (secondPosition.y < firstPosition.y)
+            return false;
         return true;
     }
 
@@ -284,7 +289,10 @@ public class BallManager : Singleton<BallManager>, BaseManager
             }
             else if (m_KeyState.Equals(KEY_STATE.KEY_PRESS))
             {
-                MousePress();
+                MousePress(out bool isPressPossible);
+
+                if (isPressPossible == false)
+                    MouseUp(out m_KeyState);
             }
         }
         else if (m_KeyState.Equals(KEY_STATE.KEY_PRESS))
@@ -305,7 +313,10 @@ public class BallManager : Singleton<BallManager>, BaseManager
 
         if (m_PcKeyState.Equals(KEY_STATE.KEY_PRESS))
         {
-            MousePress();
+            MousePress(out bool isPressPossible);
+
+            if (isPressPossible == false)
+                MouseUp(out m_PcKeyState);
         }
 
         if (Input.GetMouseButtonUp(0) &&
@@ -317,20 +328,26 @@ public class BallManager : Singleton<BallManager>, BaseManager
 
     void MouseDown()
     {
-        if (firstBall)
-            firstPosition = firstBall.transform.position;
-        else
-            firstPosition = firstBallPosition;
+        firstPosition = FirstBallPosition;
 
         secondPosition = GetTouchPoint();
     }
     
-    void MousePress()
+    void MousePress(out bool isPressPossible)
     {
         secondPosition = GetTouchPoint();
 
         Vector2 directionVector = secondPosition - firstPosition;
+
+        if (directionVector.y < 0)
+        {
+            isPressPossible = false;
+            return;
+        }
+        isPressPossible = true;
+
         directionVector.Normalize();
+
         float seta = Vector2.Dot(directionVector, new Vector2(1, 0));
         float limitDegree = ballSettingData.limitDegree;
         if (seta > Mathf.Cos(limitDegree * Mathf.Deg2Rad) || (directionVector.y < 0 && directionVector.x > 0))
@@ -345,7 +362,7 @@ public class BallManager : Singleton<BallManager>, BaseManager
             secondPosition.y = firstPosition.y + Mathf.Sin((180 - limitDegree) * Mathf.Deg2Rad);
         }
 
-        ActiveGuidLine(firstBall.transform.position);
+        ActiveGuidLine(FirstBallPosition);
     }
 
     /// <summary>
@@ -358,9 +375,11 @@ public class BallManager : Singleton<BallManager>, BaseManager
         {
             OnMouseUp();
         }
+
         keyState = KEY_STATE.NONE;
         firstPosition = new Vector2(0, 0);
         secondPosition = new Vector2(0, 0);
+        DisableGuidLine();
     }
 
     /// <summary>
@@ -378,7 +397,7 @@ public class BallManager : Singleton<BallManager>, BaseManager
         secondPosition.x = Mathf.Cos(angle * Mathf.Deg2Rad) * 10.0f;
         secondPosition.y = Mathf.Sin(angle * Mathf.Deg2Rad) * 10.0f;
 
-        ActiveGuidLine(firstBall.transform.position);
+        ActiveGuidLine(FirstBallPosition);
 
         m_KeyState = KEY_STATE.NONE;
         m_PcKeyState = KEY_STATE.NONE;
@@ -443,28 +462,58 @@ public class BallManager : Singleton<BallManager>, BaseManager
     void MoveBallLoop()
     {
         #region 공의 거리를 통해 딜레이를 알아야 할 때
-        bool isShootAble = false;
+        //bool isShootAble = false;
+        //float ballRadius = ballPacks[nowShootindex].CircleCollider2D.radius;
+
+        //if (nowShootindex == 0)
+        //    isShootAble = true;
+        //else
+        //{
+        //    Vector2 nowBallPos = ballPacks[nowShootindex].Rb2D.position;
+        //    Vector2 prevBallPos = ballPacks[nowShootindex - 1].Rb2D.position;
+
+        //    float distance = Vector2.Distance(nowBallPos, prevBallPos);
+        //    const float distanceScale = 5.5f;
+
+        //    if (distance >= ballRadius * distanceScale)
+        //    {
+        //        isShootAble = true;
+
+        //        //float currentDistance = distance - ballRadius * distanceScale;
+        //        //ballPacks[nowShootindex].Rb2D.position = nowBallPos + currentDistance * ballMoveVector.normalized;
+        //    }
+        //}
+
+
+        //if (isShootAble)
+        //{
+        //    ballPacks[nowShootindex].BallMove(ballMoveVector, ballRadius * 2.0f * 50);
+
+        //    nowShootindex += 1;
+
+        //    if (nowShootindex >= ballPacks.Count)
+        //    {
+        //        StopBallLoop();
+        //    }
+        //    else
+        //    {
+        //        Debug.Log(shootDelayCount);
+        //        shootDelayCount = 0;
+        //    }
+        //}
+
+        //shootDelayCount += Time.fixedDeltaTime;
+        #endregion
+
+        #region 공의 딜레이로 발사하고 싶을 때
+        
         float ballRadius = ballPacks[nowShootindex].CircleCollider2D.radius;
 
-        if (nowShootindex == 0)
-            isShootAble = true;
-        else
+        shootDelayCount += Time.deltaTime;
+
+        if (shootDelayCount >= 0.06f)
         {
-            Vector2 nowBallPos = ballPacks[nowShootindex].transform.position;
-            Vector2 prevBallPos = ballPacks[nowShootindex - 1].transform.position;
-
-            float distance = Vector2.Distance(nowBallPos, prevBallPos);
-
-            if (distance >= ballRadius * 4.5f)
-            {
-                isShootAble = true;
-            }
-        }
-
-
-        if (isShootAble)
-        {
-            ballPacks[nowShootindex].BallMove(ballMoveVector, ballRadius * 2.3f * 50);
+            ballPacks[nowShootindex].FireBall(ballMoveVector);  
 
             nowShootindex += 1;
 
@@ -474,30 +523,9 @@ public class BallManager : Singleton<BallManager>, BaseManager
             }
             else
             {
-                Debug.Log(shootDelayCount);
-                shootDelayCount = 0;
+                shootDelayCount = shootDelayCount - 0.06f;
             }
         }
-
-        shootDelayCount += Time.fixedDeltaTime;
-        #endregion
-
-        #region 공의 딜레이로 발사하고 싶을 때
-        //if (shootDelayCount <= 0.0f)
-        //{
-        //    ballPacks[nowShootindex].BallMove(ballMoveVector, ballSettingData.shootSpeed);
-
-        //    nowShootindex += 1;
-
-        //    if (nowShootindex >= ballPacks.Count)
-        //    {
-        //        StopBallLoop();
-        //    }
-        //    else
-        //        shootDelayCount = ballSettingData.shootDelay;
-        //}
-
-        //shootDelayCount -= Time.fixedDeltaTime;
         #endregion
     }
 
@@ -543,7 +571,7 @@ public class BallManager : Singleton<BallManager>, BaseManager
 
         StopBallLoop();
 
-        FirstBall = FindStopBall();
+        //FindStopBall();
 
         for (int i = 0; i < ballPacks.Count; i++)
             ballPacks[i].FollowBallInit();

@@ -32,9 +32,9 @@ namespace UIForm
         {
             base.Update();
 
-            if (BallManager.Instance.FirstBall)
+            if (BallManager.Instance.IsFirstTouch)
             {
-                Vector2 ballPos = BallManager.Instance.FirstBall.transform.position;
+                Vector2 ballPos = BallManager.Instance.FirstBallPosition;
                 const float hCorrection = -0.4f;
 
                 ballPos.y += hCorrection;

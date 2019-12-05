@@ -46,9 +46,9 @@ public class PhysicsBounceObject : MonoBehaviour
 
     public void FixedUpdateMe()
     {
-        Vector2 deltaPosition = velocity * Time.deltaTime;
+        Vector2 deltaPosition = velocity * Time.fixedDeltaTime;
 
-        deltaPosition += velocity * delayDistance * Time.deltaTime;
+        deltaPosition += velocity * delayDistance * Time.fixedDeltaTime;
         delayDistance = 0;
 
         Movement(deltaPosition);

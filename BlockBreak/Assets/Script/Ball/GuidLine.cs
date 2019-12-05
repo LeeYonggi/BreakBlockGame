@@ -51,8 +51,6 @@ public class GuidLine : MonoBehaviour
 
     private void GuidLineUpdate()
     {
-        if (BallManager.Instance.FirstBall == null) return;
-
         predictBall.gameObject.SetActive(true);
 
         Vector2 reflectVector = predictBall.StartPrediction(transform.position, guidDirection);

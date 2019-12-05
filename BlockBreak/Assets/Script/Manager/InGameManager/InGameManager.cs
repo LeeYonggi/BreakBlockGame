@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Manager;
+using System;
+using System.IO;
 
 public class InGameManager : Singleton<InGameManager>, BaseManager
 {
@@ -75,8 +77,63 @@ public class InGameManager : Singleton<InGameManager>, BaseManager
         nowCount += 1;
 
         BallManager.Instance.OnMouseUp += ChangePlay;
+
+        #region Stage Init
+        try
+        {
+            if (MainManager.Instance.StageInfo.isMapToolDirect)
+                CreateMapToolStage();
+            else
+                CreateStageMap();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+        }
+
+        MainManager.Instance.StageInfo.isMapToolDirect = false;
+        #endregion
     }
 
+    private void CreateStageMap()
+    {
+        string stagePath = MainManager.Instance.StageInfo.resourceMapPath;
+
+        BoxStatus[,] mapData = StageParser.CreateStageGridFromFile(stagePath);
+
+        for (int y = 0; y < StageParser.MapSize.Y; y++)
+        {
+            for (int x = 0; x < StageParser.MapSize.X; x++)
+            {
+                CreateMapAccordingState(mapData[y, x]);
+            }
+        }
+    }
+
+    private void CreateMapToolStage()
+    {
+        FileInfo fileInfo = MainManager.Instance.StageInfo.stageFileInfo;
+
+        List<BoxStatus[]> mapData = StageParser.CreateTestStageFromFile(fileInfo);
+
+        for (int y = 0; y < mapData.Count; y++)
+        {
+            for (int x = 0; x < mapData[y].Length; x++)
+            {
+                CreateMapAccordingState(mapData[y][x]);
+            }
+        }
+    }
+
+    void CreateMapAccordingState(BoxStatus mapData)
+    {
+        if (mapData.objState == BoxStatus.OBJECT_STATE.BOX)
+            InGameManager.Instance.CreateBox(mapData);
+        if (mapData.objState == BoxStatus.OBJECT_STATE.TRIANGLE)
+            InGameManager.Instance.CreateTriangle(mapData);
+        if (mapData.objState == BoxStatus.OBJECT_STATE.ITEM)
+            InGameManager.Instance.CreateItem(mapData);
+    }
     public void Start()
     {
     }
@@ -125,7 +182,7 @@ public class InGameManager : Singleton<InGameManager>, BaseManager
 
     void CreateLineBox()
     {
-        int random = Random.Range(1, 7);
+        int random = UnityEngine.Random.Range(1, 7);
         
         //for (int i = 0; i < random; i++)
         //    CreateBox();

@@ -37,8 +37,6 @@ public class PredictBall : MonoBehaviour
     /// 반사 방향
     public Vector2 StartPrediction(Vector2 firstPosition, Vector2 direction)
     {
-        if (BallManager.Instance.FirstBall == null) return new Vector2(0, 0);
-
         transform.position = firstPosition;
         rb2D.position = transform.position;
 

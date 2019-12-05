@@ -69,7 +69,6 @@ namespace Manager
                     break;
                 case SCENE_KIND.INGAME:
                     managerList.Add(BallManager.Instance);
-                    managerList.Add(StageManager.Instance);
                     managerList.Add(InGameManager.Instance);
 
                     break;
